@@ -1,5 +1,5 @@
 
-### Demo implementation to Bayarcash Payment Gateway using Vanilla PHP
+### Demo implementation to Bayarcash payment gateway using Vanilla PHP
 
-- copy config.example.php to config.example 
-- edit the config according to your development environment
+- Copy config.example.php to config.php
+- Edit the config according to your development environment
