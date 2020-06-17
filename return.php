@@ -23,9 +23,9 @@ if (isset($_POST)) {
     $payment_status = get_payment_status_name($post_data['transaction_status']);
 
     if ($payment_status != 'Successful') {
-        echo "<h3>Payment is not successful, handle unsuccessful payment from here</h3>";
+        echo "<div>Payment is not successful, handle unsuccessful payment from here</div>";
     } else {
-        echo "<h3>Payment succesful, handle succesful payment from here</h3>";
+        echo "<div>Payment succesful, handle succesful payment from here</div>";
     }
 }
 

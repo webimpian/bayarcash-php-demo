@@ -9,7 +9,7 @@ $return_url = $config['return_url'];
 $order_no = 'ORDER1';
 $order_amount = '1.00';
 $buyer_name = 'John Doe';
-$buyer_email = 'johndoe@example.com';
+$buyer_email = 'hai@bayar.cash';
 $buyer_tel = '0168788787';
 $payment_gateway = 1;
 $api_url = $config['bayarcash_api_url'];
@@ -23,7 +23,12 @@ $payment_form_id = md5($order_no . time()); # Safety features: Generate and assi
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-<div id="container" class="container col-6 mt-4 mb-4">
+<div id="container" class="container col-4 mt-3 mb-4">
+	<div class="mb-3">
+		<a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
+			Reference from GitHub repo
+		</a>
+	</div>
 	<div class="card">
 		<div class="card-header">
 			Transaction Details
@@ -104,7 +109,7 @@ $payment_form_id = md5($order_no . time()); # Safety features: Generate and assi
 				<input type="hidden" name="portal_key" readonly="true" value="<?php echo $fpx_portal_key ?>"/>
 
 				<!-- Submit -->
-				<button class="btn btn-primary mt-2" type="submit">
+				<button class="btn btn-primary mt-2 btn-block" type="submit">
 					Proceed to Payment
 				</button>
 			</form>
