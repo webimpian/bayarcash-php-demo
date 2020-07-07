@@ -9,23 +9,46 @@ if (isset($_POST)) {
     }
 
     $post_data = [
-        'fpx_data' => $_POST['fpx_data'],
+        'order_ref_no' => $_POST['order_ref_no'],
         'order_no' => $_POST['order_no'],
         'transaction_currency' => $_POST['transaction_currency'],
         'order_amount' => $_POST['order_amount'],
         'buyer_name' => $_POST['buyer_name'],
-        'buyer_email' => $_POST['buyer_email'],
+        'buyer_email'  => $_POST['buyer_email'],
         'buyer_bank_name' => $_POST['buyer_bank_name'],
         'transaction_status' => $_POST['transaction_status'],
-        'transaction_status_description' => $_POST['transaction_status_description']
+        'transaction_status_description' => $_POST['transaction_status_description'],
+        'transaction_datetime' => $_POST['transaction_datetime'],
+        'transaction_gateway_id' => $_POST['transaction_gateway_id'],
     ];
 
     $payment_status = get_payment_status_name($post_data['transaction_status']);
 
+    $post_response = print_r($post_data, true); 
+    $order_ref_no = $post_data['order_ref_no']; 
+
     if ($payment_status != 'Successful') {
         echo "<div>Payment is not successful, handle unsuccessful payment from here</div>";
+        echo '<br>';
+        echo '<div>Response is in $post_data array </div>';
+        echo "<pre>{$post_response}</pre>";
+        echo '<br>';
+        echo '<div>To access FPX Transaction ID property</div>';
+        echo '<br>';
+        echo '$post_data[\'order_ref_no\']';
+        echo '<br>';
+        echo "<pre>{$order_ref_no}</pre>";
     } else {
-        echo "<div>Payment succesful, handle succesful payment from here</div>";
+        echo '<div>Payment succesful, handle succesful payment from here</div>';
+        echo '<br>';
+        echo '<div>Response is in $post_data array </div>';
+        echo "<pre>{$post_response}</pre>";
+        echo '<br>';
+        echo '<div>To access FPX Transaction ID property</div>';
+        echo '<br>';
+        echo '$post_data[\'order_ref_no\']';
+        echo '<br>';
+        echo "<pre>{$order_ref_no}</pre>";
     }
 }
 
