@@ -10,49 +10,43 @@ $FPX_OrderRefNo = [
 
 $results = [];
 
-try {
-foreach ($FPX_OrderRefNo as $OrderRefNo) {
-
+$results = array_map(function ($OrderRefNo) use ($bearer_token) {
     $fpx_api_data = array(
         "bearer_token" => $bearer_token,
         "FPX_OrderRefNo" => $OrderRefNo
     );
 
-    $results = array_push($results, $get_transaction_statuses($fpx_api_data));
-}
+    return get_transaction_statuses($fpx_api_data);
+}, $FPX_OrderRefNo);
 
 // return back results
-    return json_encode($result);
-}catch(Exception $e){
-    return $e->getMessage();
-}
+return json_encode($results);
 
 function get_transaction_statuses($fpx_api_data)
 {
 
- $curl_output = FPX_API_cURL($fpx_api_data);
+    $curl_output = FPX_API_cURL($fpx_api_data);
 
- $decoded_curl_output = json_decode($curl_output)
-    ->output
-    ->transactionsList
-    ->recordsListData[0]
-    ->transaction_details;
+    $decoded_curl_output = json_decode($curl_output)
+        ->output
+        ->transactionsList
+        ->recordsListData[0]
+        ->transaction_details;
 
- $transaction_detail = [
-    'status_value' => get_payment_status_name($decoded_curl_output->status->value),
-    'status_description' => $decoded_curl_output->status_description->value,
-    'amount' => $decoded_curl_output->amount->value,
-    'fpx_product_desc' => $decoded_curl_output->fpx_product_desc->value,
-    'buyer_name' => $decoded_curl_output->buyer_name->value,
-    'buyer_email' => $decoded_curl_output->buyer_email->value,
-    'exchange_order_no' => $decoded_curl_output->exchange_order_no->value,
-    'transaction_id' => $decoded_curl_output->transaction_id->value,
-    'datetime' => $decoded_curl_output->datetime->value,
-    'bank_name' => $decoded_curl_output->buyer_bank_name->value
-];
+    $transaction_detail = [
+        'status_value' => get_payment_status_name($decoded_curl_output->status->value),
+        'status_description' => $decoded_curl_output->status_description->value,
+        'amount' => $decoded_curl_output->amount->value,
+        'fpx_product_desc' => $decoded_curl_output->fpx_product_desc->value,
+        'buyer_name' => $decoded_curl_output->buyer_name->value,
+        'buyer_email' => $decoded_curl_output->buyer_email->value,
+        'exchange_order_no' => $decoded_curl_output->exchange_order_no->value,
+        'transaction_id' => $decoded_curl_output->transaction_id->value,
+        'datetime' => $decoded_curl_output->datetime->value,
+        'bank_name' => $decoded_curl_output->buyer_bank_name->value
+    ];
 
- return $transaction_detail;
-
+    return $transaction_detail;
 }
 
 function FPX_API_cURL(array $fpx_api_data)
