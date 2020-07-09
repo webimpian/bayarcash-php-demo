@@ -8,6 +8,8 @@ $FPX_OrderRefNo = [
     "1-594-259-001-444911"
 ];
 
+$results = [];
+
 foreach ($FPX_OrderRefNo as $OrderRefNo) {
 
     $fpx_api_data = array(
@@ -15,8 +17,11 @@ foreach ($FPX_OrderRefNo as $OrderRefNo) {
         "FPX_OrderRefNo" => $OrderRefNo
     );
 
-    get_transaction_statuses($fpx_api_data);
+    $results = array_push($results, $get_transaction_statuses($fpx_api_data));
 }
+
+// return back results
+return json_encode($result);
 
 function get_transaction_statuses($fpx_api_data)
 {
@@ -30,7 +35,7 @@ function get_transaction_statuses($fpx_api_data)
     ->transaction_details;
 
  $transaction_detail = [
-    'status_value' => $decoded_curl_output->status->value,
+    'status_value' => get_payment_status_name($decoded_curl_output->status->value),
     'status_description' => $decoded_curl_output->status_description->value,
     'amount' => $decoded_curl_output->amount->value,
     'fpx_product_desc' => $decoded_curl_output->fpx_product_desc->value,
@@ -42,19 +47,8 @@ function get_transaction_statuses($fpx_api_data)
     'bank_name' => $decoded_curl_output->buyer_bank_name->value
 ];
 
-$payment_status_name = get_payment_status_name($transaction_detail['status_value']);
+ return $transaction_detail;
 
-echo '<br>';
-echo 'Buyer name :  ' . $transaction_detail['buyer_name'] . '<br>';
-echo 'Buyer email :  ' . $transaction_detail['buyer_email'] . '<br>';
-echo 'Transaction ID :  ' . $transaction_detail['transaction_id'] . '<br>';
-echo 'Exchange order no : ' . $transaction_detail['exchange_order_no'] . '<br>';
-echo 'Bank name :  ' . $transaction_detail['bank_name'] . '<br>';
-echo 'Order No :  ' . $transaction_detail['fpx_product_desc'] . '<br>';
-echo 'Transaction Status :  ' . $payment_status_name . '<br>';
-echo '<hr>';
-
-return json_decode($transaction_detail);
 }
 
 function FPX_API_cURL(array $fpx_api_data)
