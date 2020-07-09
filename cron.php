@@ -10,6 +10,7 @@ $FPX_OrderRefNo = [
 
 $results = [];
 
+try {
 foreach ($FPX_OrderRefNo as $OrderRefNo) {
 
     $fpx_api_data = array(
@@ -21,7 +22,6 @@ foreach ($FPX_OrderRefNo as $OrderRefNo) {
 }
 
 // return back results
-try {
     return json_encode($result);
 }catch(Exception $e){
     return $e->getMessage();
