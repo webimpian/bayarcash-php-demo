@@ -21,7 +21,11 @@ foreach ($FPX_OrderRefNo as $OrderRefNo) {
 }
 
 // return back results
-return json_encode($result);
+try {
+    return json_encode($result);
+}catch(Exception $e){
+    return $e->getMessage();
+}
 
 function get_transaction_statuses($fpx_api_data)
 {
