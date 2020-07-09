@@ -54,7 +54,7 @@ echo 'Order No :  ' . $transaction_detail['fpx_product_desc'] . '<br>';
 echo 'Transaction Status :  ' . $payment_status_name . '<br>';
 echo '<hr>';
 
-return $transaction_detail;
+return json_decode($transaction_detail);
 }
 
 function FPX_API_cURL(array $fpx_api_data)
