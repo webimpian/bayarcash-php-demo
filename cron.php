@@ -20,7 +20,8 @@ $results = array_map(function ($OrderRefNo) use ($bearer_token) {
 }, $FPX_OrderRefNo);
 
 // return back results
-return json_encode($results);
+header('Content-type: application/json');
+echo json_encode($results);
 
 function get_transaction_statuses($fpx_api_data)
 {
