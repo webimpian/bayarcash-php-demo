@@ -50,6 +50,8 @@ function displayOutputMessage($payment_status, $post_data){
     echo '$post_data[\'order_ref_no\']';
     echo '<br>';
     echo "<pre>{$order_ref_no}</pre>";
+    echo '<br>';
+    echo '<div>Please save this FPX Transaction ID for future reference</div>';
 }
 
 function check_portal_key_valid($portal_key)
