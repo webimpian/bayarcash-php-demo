@@ -1,7 +1,7 @@
 <?php
 require_once('config.php');
 
-$bearer_token = $config['bayarcash_FPX_portal_key'];
+$bearer_token = $config['bayarcash_FPX_bearer_token'];
 
 /**
 * Query for order that have the status 'pending order' preferably for today only here,
