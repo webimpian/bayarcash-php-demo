@@ -43,6 +43,17 @@ $unsuccessful_payment = array_map(function ($result){
     }
 }, $results);
 
+// update pending payment status to paid payment
+foreach($successful_payment as $payment){
+    $fpx_order_ref_no = $payment['order_ref_no'];
+    $order_no = $payment['order_no'];
+}
+
+// update pending payment status to failed payment
+foreach($unsuccessful_payment as $payment){
+    $fpx_order_ref_no = $payment['order_ref_no'];
+    $order_no = $payment['order_no'];
+}
 
 
 // return back results
