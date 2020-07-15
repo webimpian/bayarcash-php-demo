@@ -4,7 +4,7 @@ require_once('config.php');
 $bearer_token = $config['bayarcash_FPX_bearer_token'];
 
 /**
-* Query for order that have the status 'pending order' preferably for today only here,
+* Query from DB for order that have the status 'pending order' preferably for today only here,
 * extract the fpx order ref no in array and
 * assign to the variable $FPX_OrderRefNo below
 **/
@@ -24,6 +24,26 @@ $results = array_map(function ($OrderRefNo) use ($bearer_token) {
 
     return get_transaction_statuses($fpx_api_data);
 }, $FPX_OrderRefNo);
+
+/**
+* Based on results, update the purchase records either successful or unsuccessful here 
+**/
+
+// Group results into successful_payment and unsuccessful_payment
+$successful_payment = array_map(function ($result){
+    if($result['status_value'] == 'Successful') {
+        return $result;
+    }
+}, $results);
+
+
+$unsuccessful_payment = array_map(function ($result){
+    if($result['status_value'] == 'Unsuccessful') {
+        return $result;
+    }
+}, $results);
+
+
 
 // return back results
 header('Content-type: application/json');
