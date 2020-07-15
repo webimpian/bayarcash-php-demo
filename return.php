@@ -22,34 +22,34 @@ if (isset($_POST)) {
         'transaction_gateway_id' => $_POST['transaction_gateway_id'],
     ];
 
-    $payment_status = get_payment_status_name($post_data['transaction_status']);
+
+    displayOutputMessage($payment_status, $post_data);
+}
+
+function displayOutputMessage($payment_status, $post_data){
 
     $post_response = print_r($post_data, true); 
+
+    $payment_status = get_payment_status_name($post_data['transaction_status']);
+
     $order_ref_no = $post_data['order_ref_no']; 
 
+    $payment_status_message = 'Payment succesful, handle succesful payment from here';
+
     if ($payment_status != 'Successful') {
-        echo "<div>Payment is not successful, handle unsuccessful payment from here</div>";
-        echo '<br>';
-        echo '<div>Response is in $post_data array </div>';
-        echo "<pre>{$post_response}</pre>";
-        echo '<br>';
-        echo '<div>To access FPX Transaction ID property</div>';
-        echo '<br>';
-        echo '$post_data[\'order_ref_no\']';
-        echo '<br>';
-        echo "<pre>{$order_ref_no}</pre>";
-    } else {
-        echo '<div>Payment succesful, handle succesful payment from here</div>';
-        echo '<br>';
-        echo '<div>Response is in $post_data array </div>';
-        echo "<pre>{$post_response}</pre>";
-        echo '<br>';
-        echo '<div>To access FPX Transaction ID property</div>';
-        echo '<br>';
-        echo '$post_data[\'order_ref_no\']';
-        echo '<br>';
-        echo "<pre>{$order_ref_no}</pre>";
+        $payment_status_message = 'Payment is not successful, handle unsuccessful payment from here'; 
     }
+
+    echo "<div>{$payment_status_message}</div>";
+    echo '<br>';
+    echo '<div>Response is in $post_data array </div>';
+    echo "<pre>{$post_response}</pre>";
+    echo '<br>';
+    echo '<div>To access FPX Transaction ID property</div>';
+    echo '<br>';
+    echo '$post_data[\'order_ref_no\']';
+    echo '<br>';
+    echo "<pre>{$order_ref_no}</pre>";
 }
 
 function check_portal_key_valid($portal_key)
