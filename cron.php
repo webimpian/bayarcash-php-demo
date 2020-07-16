@@ -154,5 +154,13 @@ function log_results($result)
         mkdir('./logs');
     }
 
-    file_put_contents('./logs/log_'.date("j.n.Y").'.log', $result, FILE_APPEND);
+    $timezone = 'Asia/Kuala_Lumpur';
+    $timezone_object = new DateTimeZone($timezone);
+    $today = new DateTime("now", $timezone_object);
+    $timestamp = $today->format('j/n/Y h:i a');
+
+    $log = "\n\nLog generated at " . $timestamp . "\n";
+    $log .= $result;
+
+    file_put_contents('./logs/log_'.date("j.n.Y").'.log', $log, FILE_APPEND);
 }
