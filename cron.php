@@ -44,15 +44,19 @@ $unsuccessful_payment = array_map(function ($result){
 }, $results);
 
 // update pending payment status to paid payment
-foreach($successful_payment as $payment){
-    $fpx_order_ref_no = $payment['exchange_order_no'];
-    $order_no = $payment['fpx_product_desc'];
+if(! empty($successful_payment)) {
+    foreach($successful_payment as $payment){
+        $fpx_order_ref_no = $payment['exchange_order_no'];
+        $order_no = $payment['fpx_product_desc'];
+    }
 }
 
 // update pending payment status to failed payment
-foreach($unsuccessful_payment as $payment){
-    $fpx_order_ref_no = $payment['exchange_order_no'];
-    $order_no = $payment['fpx_product_desc'];
+if(! empty($unsuccessful_payment)) {
+    foreach($unsuccessful_payment as $payment){
+        $fpx_order_ref_no = $payment['exchange_order_no'];
+        $order_no = $payment['fpx_product_desc'];
+    }
 }
 
 // record log result
