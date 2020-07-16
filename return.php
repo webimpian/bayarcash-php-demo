@@ -1,6 +1,10 @@
 <?php
 require_once('config.php');
 
+if (isset($_POST['fpx_pre_transaction_data'])) {
+    log_results(print_r($_POST['fpx_pre_transaction_data'], true));
+}
+
 if (isset($_POST)) {
     $is_portal_key_valid = check_portal_key_valid($config['bayarcash_FPX_portal_key']);
 
@@ -82,4 +86,22 @@ function get_payment_status_name($payment_status_code)
     }
 
     return $payment_status_name_list[$payment_status_code];
+}
+
+function log_results($result)
+{
+    // create logs directory if doesn't exist
+    if(! is_dir('./logs')){
+        mkdir('./logs');
+    }
+
+    $timezone = 'Asia/Kuala_Lumpur';
+    $timezone_object = new DateTimeZone($timezone);
+    $today = new DateTime("now", $timezone_object);
+    $timestamp = $today->format('j/n/Y h:i a');
+
+    $log = "\n\nLog generated at " . $timestamp . "\n";
+    $log .= $result;
+
+    file_put_contents('./logs/log_'.date("j.n.Y").'.log', $log, FILE_APPEND);
 }
