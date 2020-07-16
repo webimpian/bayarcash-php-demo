@@ -45,16 +45,18 @@ $unsuccessful_payment = array_map(function ($result){
 
 // update pending payment status to paid payment
 foreach($successful_payment as $payment){
-    $fpx_order_ref_no = $payment['order_ref_no'];
-    $order_no = $payment['order_no'];
+    $fpx_order_ref_no = $payment['exchange_order_no'];
+    $order_no = $payment['fpx_product_desc'];
 }
 
 // update pending payment status to failed payment
 foreach($unsuccessful_payment as $payment){
-    $fpx_order_ref_no = $payment['order_ref_no'];
-    $order_no = $payment['order_no'];
+    $fpx_order_ref_no = $payment['exchange_order_no'];
+    $order_no = $payment['fpx_product_desc'];
 }
 
+// record log result
+log_results(print_r($results, true));
 
 // return back results
 header('Content-type: application/json');
@@ -143,4 +145,14 @@ function get_payment_status_name($payment_status_code)
     }
 
     return $payment_status_name_list[$payment_status_code];
+}
+
+function log_results($result)
+{
+    // create logs directory if doesn't exist
+    if(! is_dir('./logs')){
+        mkdir('./logs');
+    }
+
+    file_put_contents('./logs/log_'.date("j.n.Y").'.log', $result, FILE_APPEND);
 }
