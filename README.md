@@ -10,5 +10,5 @@
     - external service : https://cron-job.org/en/, or any external cron services
 * Example linux cron command to run cron.php for every 5 minutes: 
   ```shell
-  */5 * * * * /usr/bin/php /var/www/ecommerce/cron.php
+  */5 * * * * /usr/bin/php /var/www/ecommerce/cron.php >> /dev/null 2>&1
   ```
