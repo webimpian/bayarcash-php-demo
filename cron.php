@@ -1,5 +1,6 @@
 <?php
 require_once('config.php');
+require_once('TransactionModel.php');
 
 $bearer_token = $config['bayarcash_FPX_bearer_token'];
 
@@ -8,11 +9,9 @@ $bearer_token = $config['bayarcash_FPX_bearer_token'];
 * extract the fpx order ref no in array and
 * assign to the variable $FPX_OrderRefNo below
 **/
-$FPX_OrderRefNo = [
-    "1-593-263-118-994880",
-    "1-594-106-159-975990",
-    "1-594-259-001-444911"
-];
+
+$transactionModel = new TransactionModel();
+$FPX_OrderRefNo = $transactionModel->getNewTransactionsOrderRefNo(); 
 
 $results = [];
 
@@ -81,7 +80,7 @@ function get_transaction_statuses($fpx_api_data)
         'status_value' => get_payment_status_name($decoded_curl_output->status->value),
         'status_description' => $decoded_curl_output->status_description->value,
         'amount' => $decoded_curl_output->amount->value,
-        'fpx_product_desc' => $decoded_curl_output->fpx_product_desc->value,
+        'order_no' => $decoded_curl_output->fpx_product_desc->value,
         'buyer_name' => $decoded_curl_output->buyer_name->value,
         'buyer_email' => $decoded_curl_output->buyer_email->value,
         'exchange_order_no' => $decoded_curl_output->exchange_order_no->value,
