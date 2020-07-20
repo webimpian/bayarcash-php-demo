@@ -173,7 +173,7 @@ class TransactionModel{
          buyer_email VARCHAR(50),
          buyer_bank_name VARCHAR(50),
          transaction_status VARCHAR(50),
-         transaction_status_description VARCHAR(50),
+         transaction_status_description VARCHAR(255),
          transaction_datetime VARCHAR(50),
          transaction_gateway_id VARCHAR(50),
          order_ref_no VARCHAR(50),
