@@ -1,5 +1,6 @@
 <?php
 require_once('config.php');
+require_once('TransactionModel.php');
 
 $bearer_token = $config['bayarcash_FPX_bearer_token'];
 
@@ -8,13 +9,16 @@ $bearer_token = $config['bayarcash_FPX_bearer_token'];
 * extract the fpx order ref no in array and
 * assign to the variable $FPX_OrderRefNo below
 **/
-$FPX_OrderRefNo = [
-    "1-593-263-118-994880",
-    "1-594-106-159-975990",
-    "1-594-259-001-444911"
-];
+
+$transactionModel = new TransactionModel($config);
+$FPX_OrderRefNo = $transactionModel->getNewTransactionsOrderRefNo(); 
 
 $results = [];
+
+if(empty($FPX_OrderRefNo)){
+    echo 'Empty FPX_OrderRefNo';
+    return;
+}
 
 $results = array_map(function ($OrderRefNo) use ($bearer_token) {
     $fpx_api_data = array(
@@ -26,36 +30,13 @@ $results = array_map(function ($OrderRefNo) use ($bearer_token) {
 }, $FPX_OrderRefNo);
 
 /**
-* Based on results, update the purchase records either successful or unsuccessful here 
+* Update payment
 **/
 
-// Group results into successful_payment and unsuccessful_payment
-$successful_payment = array_map(function ($result){
-    if($result['status_value'] == 'Successful') {
-        return $result;
-    }
-}, $results);
-
-
-$unsuccessful_payment = array_map(function ($result){
-    if($result['status_value'] == 'Unsuccessful') {
-        return $result;
-    }
-}, $results);
-
-// update pending payment status to paid payment
-if(! empty($successful_payment)) {
-    foreach($successful_payment as $payment){
-        $fpx_order_ref_no = $payment['exchange_order_no'];
-        $order_no = $payment['fpx_product_desc'];
-    }
-}
-
 // update pending payment status to failed payment
-if(! empty($unsuccessful_payment)) {
-    foreach($unsuccessful_payment as $payment){
-        $fpx_order_ref_no = $payment['exchange_order_no'];
-        $order_no = $payment['fpx_product_desc'];
+if(! empty($results)) {
+    foreach($results as $payment){
+        $transactionModel->update($payment);
     }
 }
 
@@ -78,16 +59,17 @@ function get_transaction_statuses($fpx_api_data)
         ->transaction_details;
 
     $transaction_detail = [
-        'status_value' => get_payment_status_name($decoded_curl_output->status->value),
-        'status_description' => $decoded_curl_output->status_description->value,
-        'amount' => $decoded_curl_output->amount->value,
-        'fpx_product_desc' => $decoded_curl_output->fpx_product_desc->value,
+        'order_no' => $decoded_curl_output->fpx_product_desc->value,
+        'transaction_currency' => $decoded_curl_output->currency->value,
+        'order_amount' => $decoded_curl_output->amount->value,
         'buyer_name' => $decoded_curl_output->buyer_name->value,
         'buyer_email' => $decoded_curl_output->buyer_email->value,
-        'exchange_order_no' => $decoded_curl_output->exchange_order_no->value,
-        'transaction_id' => $decoded_curl_output->transaction_id->value,
-        'datetime' => $decoded_curl_output->datetime->value,
-        'bank_name' => $decoded_curl_output->buyer_bank_name->value
+        'buyer_bank_name' => $decoded_curl_output->buyer_bank_name->value,
+        'transaction_status' => $decoded_curl_output->status->value,
+        'transaction_status_description' => $decoded_curl_output->status_description->value,
+        'transaction_datetime' => $decoded_curl_output->datetime->value,
+        'transaction_gateway_id' => $decoded_curl_output->transaction_id->value,
+        'order_ref_no' => $decoded_curl_output->exchange_order_no->value,
     ];
 
     return $transaction_detail;

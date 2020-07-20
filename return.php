@@ -1,11 +1,23 @@
 <?php
 require_once('config.php');
+require_once('TransactionModel.php');
 
 if (isset($_POST['fpx_pre_transaction_data'])) {
-    log_results(print_r($_POST['fpx_pre_transaction_data'], true));
+
+    $post_data = [
+        'order_ref_no' => $_POST['fpx_pre_transaction_data']['fpx_exchange_order_number'],
+        'order_no' => $_POST['fpx_pre_transaction_data']['fpx_order_number'],
+    ];
+
+    if(empty($post_data['order_ref_no'])){
+        return;
+    }
+
+    $transaction = new TransactionModel($config);
+    $transaction->insert($post_data);
 }
 
-if (isset($_POST)) {
+if (isset($_POST['fpx_data'])) {
     $is_portal_key_valid = check_portal_key_valid($config['bayarcash_FPX_portal_key']);
 
     if (!$is_portal_key_valid) {
@@ -26,11 +38,12 @@ if (isset($_POST)) {
         'transaction_gateway_id' => $_POST['transaction_gateway_id'],
     ];
 
+    $payment_status = get_payment_status_name($post_data['transaction_status']);
 
-    displayOutputMessage($payment_status, $post_data);
+    handlePayment($payment_status, $post_data, $config);
 }
 
-function displayOutputMessage($payment_status, $post_data){
+function handlePayment($payment_status, $post_data, $config){
 
     $post_response = print_r($post_data, true); 
 
@@ -38,10 +51,16 @@ function displayOutputMessage($payment_status, $post_data){
 
     $order_ref_no = $post_data['order_ref_no']; 
 
-    $payment_status_message = 'Payment succesful, handle succesful payment from here';
+    $transaction = new TransactionModel($config);
 
-    if ($payment_status != 'Successful') {
+    if ($payment_status == 'Successful') {
+        $payment_status_message = 'Payment is successful, handle unsuccessful payment from here'; 
+        $transaction->update($post_data);
+    }
+
+    if ($payment_status == 'Unsuccessful') {
         $payment_status_message = 'Payment is not successful, handle unsuccessful payment from here'; 
+        $transaction->update($post_data);
     }
 
     echo "<div>{$payment_status_message}</div>";
