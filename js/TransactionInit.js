@@ -16,8 +16,6 @@ document.addEventListener('submit', function(event) {
         "order_no" : order_no,
     };
 
-    console.log(data);
-
     initTransaction(data);
 
 }, false);
