@@ -95,6 +95,25 @@ class TransactionModel{
                     ->fetchAll();
     }
 
+    public function init($transaction)
+    {
+        return $this->pdo->prepare(
+            'INSERT INTO transactions(
+                buyer_ic_no, 
+                order_no,
+                transaction_status
+            )values(
+                :buyer_ic_no, 
+                :order_no,   
+                :transaction_status
+            )'
+        )->execute([
+            'buyer_ic_no' => $transaction['buyer_ic_no'] ?? null, 
+            'order_no' => $transaction['order_no'] ?? null,
+            'transaction_status' => $this->get_payment_status_name(0)
+        ]);
+    }
+
     public function insert($transaction)
     {
         return $this->pdo->prepare(
@@ -153,11 +172,44 @@ class TransactionModel{
         ]);
     }
 
+    public function updateByOrderNo($transaction)
+    {
+        return $this->pdo->prepare('
+            UPDATE transactions SET
+            order_ref_no = :order_ref_no,
+            transaction_currency = :transaction_currency,
+            order_amount = :order_amount,
+            buyer_name = :buyer_name,
+            buyer_email = :buyer_email,
+            buyer_bank_name = :buyer_bank_name,
+            transaction_status_description = :transaction_status_description,
+            transaction_datetime =  :transaction_datetime,
+            transaction_gateway_id = :transaction_gateway_id
+            where
+            order_no = :order_no
+        ')->execute([
+            'order_ref_no' => $transaction['order_ref_no'] ?? null,
+            'transaction_currency' => $transaction['transaction_currency'] ?? null, 
+            'order_amount' => $transaction['order_amount'] ?? null, 
+            'buyer_name' => $transaction['buyer_name'] ?? null, 
+            'buyer_email' => $transaction['buyer_email'] ?? null,
+            'buyer_bank_name' => $transaction['buyer_bank_name'] ?? null,
+            'transaction_status_description' => $transaction['transaction_status_description'] ?? null,
+            'transaction_datetime' => $transaction['transaction_datetime'] ?? null, 
+            'transaction_gateway_id' => $transaction['transaction_gateway_id'] ?? null,
+            'order_no' => $transaction['order_no'] ?? null,
+        ]);
+    }
+
     public function setup()
     {
-        $table = $this->pdo->query('SHOW TABLES LIKE \'transactions\'')->fetch();
+        $statement = $this->pdo->prepare('SHOW TABLES LIKE \'transactions\'');
 
-        $isTableExist = in_array('transactions', $table);
+        $statement->execute();
+
+        $tables = $statement->fetchAll();
+
+        $isTableExist = in_array('transactions', $tables);
 
         if($isTableExist) {
             echo 'transaction table exist';
@@ -166,6 +218,8 @@ class TransactionModel{
 
         $this->pdo->query('
         CREATE TABLE transactions (
+         id int NOT NULL AUTO_INCREMENT,
+         buyer_ic_no VARCHAR(50),
          order_no VARCHAR(50),
          transaction_currency VARCHAR(50), 
          order_amount VARCHAR(50), 
@@ -177,17 +231,17 @@ class TransactionModel{
          transaction_datetime VARCHAR(50),
          transaction_gateway_id VARCHAR(50),
          order_ref_no VARCHAR(50),
-         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+         PRIMARY KEY (id)
         ) 
         ');
     }
 
     public function destroy()
     {
-        $this->pdo->query('
-            DROP TABLE transactions
-        ) 
-        ');
+        $statement = $this->pdo->prepare('DROP TABLE transactions');
+
+        return $statement->execute();
     }
 
     function get_payment_status_name($payment_status_code)

@@ -6,6 +6,7 @@ require_once('config.php');
  * */
 $fpx_portal_key = $config['bayarcash_FPX_portal_key'];
 $return_url = $config['return_url'];
+$buyer_ic_no = '010010010101';
 $order_no = 'ORDER1';
 $order_amount = '1.00';
 $buyer_name = 'John Doe';
@@ -34,11 +35,20 @@ $payment_form_id = md5($order_no . time()); # Safety features: Generate and assi
 			Transaction Details
 		</div>
 		<div class="card-body">
-			<form id="<?php echo $payment_form_id ?>" method="POST" action="<?php echo $api_url ?>" class="mb-0 pb-0">
+			<form id="<?php echo $payment_form_id ?>" method="POST" action="<?php echo $api_url ?>" class="mb-0 pb-0 bayarcash-form">
 
 				<div class="card-text">
 					<div class="row">
 						<div class="col">
+							<!-- ID Number -->
+							<div class="form-group mb-2">
+								<label class="mb-1" for="order_no">
+									<b>Buyer IC Number</b>
+								</label>
+								<div>
+									<input type="text" name="buyer_ic_no" id="buyer_ic_no" class="form-control" value="<?php echo $buyer_ic_no ?>" required>
+								</div>
+							</div>
 
 							<!-- ID Number -->
 							<div class="form-group mb-2">
@@ -120,5 +130,6 @@ $payment_form_id = md5($order_no . time()); # Safety features: Generate and assi
 <!-- Footer -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="js/TransactionInit.js"></script>
 </body>
 </html>

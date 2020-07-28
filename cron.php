@@ -1,6 +1,7 @@
 <?php
 require_once('config.php');
 require_once('TransactionModel.php');
+require_once('helper.php');
 
 $bearer_token = $config['bayarcash_FPX_bearer_token'];
 
@@ -33,7 +34,6 @@ $results = array_map(function ($OrderRefNo) use ($bearer_token) {
 * Update payment
 **/
 
-// update pending payment status to failed payment
 if(! empty($results)) {
     foreach($results as $payment){
         $transactionModel->update($payment);
@@ -114,39 +114,6 @@ function FPX_API_cURL(array $fpx_api_data)
     return $fpx_curl_output;
 }
 
-function get_payment_status_name($payment_status_code)
-{
-    $payment_status_name_list = [
-        'New',
-        'Pending',
-        'Unsuccessful',
-        'Successful',
-        'Cancelled'
-    ];
 
-    $is_Id = array_key_exists($payment_status_code, $payment_status_name_list);
 
-    if (!$is_Id) {
-        return;
-    }
 
-    return $payment_status_name_list[$payment_status_code];
-}
-
-function log_results($result)
-{
-    // create logs directory if doesn't exist
-    if(! is_dir('./logs')){
-        mkdir('./logs');
-    }
-
-    $timezone = 'Asia/Kuala_Lumpur';
-    $timezone_object = new DateTimeZone($timezone);
-    $today = new DateTime("now", $timezone_object);
-    $timestamp = $today->format('j/n/Y h:i a');
-
-    $log = "\n\nLog generated at " . $timestamp . "\n";
-    $log .= $result;
-
-    file_put_contents('./logs/log_'.date("j.n.Y").'.log', $log, FILE_APPEND);
-}
