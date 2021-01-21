@@ -222,7 +222,7 @@ class TransactionModel
                 'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
                 'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
                 'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
-                'transaction_status' => isset($transaction['transaction_status']) ?  $transaction['transaction_status'] : null,
+                'transaction_status' => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
                 'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
                 'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
                 'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null,
