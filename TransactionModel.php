@@ -151,8 +151,8 @@ class TransactionModel
                 :transaction_status
             )'
             )->execute([
-                'buyer_ic_no' => $transaction['buyer_ic_no'] ?? null,
-                'order_no' => $transaction['order_no'] ?? null,
+                'buyer_ic_no' => isset($transaction['buyer_ic_no']) ?  $transaction['buyer_ic_no'] : null,
+                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
                 'transaction_status' => $this->get_payment_status_name(0)
             ]);
         } catch (\PDOException $e) {
@@ -177,17 +177,17 @@ class TransactionModel
                 :transaction_datetime, :transaction_gateway_id
             )'
             )->execute([
-                'order_ref_no' => $transaction['order_ref_no'] ?? null,
-                'order_no' => $transaction['order_no'] ?? null,
-                'transaction_currency' => $transaction['transaction_currency'] ?? null,
-                'order_amount' => $transaction['order_amount'] ?? null,
-                'buyer_name' => $transaction['buyer_name'] ?? null,
-                'buyer_email' => $transaction['buyer_email'] ?? null,
-                'buyer_bank_name' => $transaction['buyer_bank_name'] ?? null,
-                'transaction_status' => $this->get_payment_status_name($transaction['transaction_status']) ?? $this->get_payment_status_name(0),
-                'transaction_status_description' => $transaction['transaction_status_description'] ?? null,
-                'transaction_datetime' => $transaction['transaction_datetime'] ?? null,
-                'transaction_gateway_id' => $transaction['transaction_gateway_id'] ?? null
+                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null,
+                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
+                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
+                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
+                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
+                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
+                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
+                'transaction_status' => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
+                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null
             ]);
         } catch (\PDOException $e) {
 
@@ -216,17 +216,17 @@ class TransactionModel
             where
             order_ref_no = :order_ref_no
         ')->execute([
-                'order_no' => $transaction['order_no'] ?? null,
-                'transaction_currency' => $transaction['transaction_currency'] ?? null,
-                'order_amount' => $transaction['order_amount'] ?? null,
-                'buyer_name' => $transaction['buyer_name'] ?? null,
-                'buyer_email' => $transaction['buyer_email'] ?? null,
-                'buyer_bank_name' => $transaction['buyer_bank_name'] ?? null,
-                'transaction_status' => $this->get_payment_status_name($transaction['transaction_status']) ?? null,
-                'transaction_status_description' => $transaction['transaction_status_description'] ?? null,
-                'transaction_datetime' => $transaction['transaction_datetime'] ?? null,
-                'transaction_gateway_id' => $transaction['transaction_gateway_id'] ?? null,
-                'order_ref_no' => $transaction['order_ref_no'] ?? null
+                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
+                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
+                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
+                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
+                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
+                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
+                'transaction_status' => isset($transaction['transaction_status']) ?  $transaction['transaction_status'] : null,
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
+                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null,
+                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null
             ]);
         } catch (\PDOException $e) {
 
@@ -253,16 +253,16 @@ class TransactionModel
             where
             order_no = :order_no
         ')->execute([
-                'order_ref_no' => $transaction['order_ref_no'] ?? null,
-                'transaction_currency' => $transaction['transaction_currency'] ?? null,
-                'order_amount' => $transaction['order_amount'] ?? null,
-                'buyer_name' => $transaction['buyer_name'] ?? null,
-                'buyer_email' => $transaction['buyer_email'] ?? null,
-                'buyer_bank_name' => $transaction['buyer_bank_name'] ?? null,
-                'transaction_status_description' => $transaction['transaction_status_description'] ?? null,
-                'transaction_datetime' => $transaction['transaction_datetime'] ?? null,
-                'transaction_gateway_id' => $transaction['transaction_gateway_id'] ?? null,
-                'order_no' => $transaction['order_no'] ?? null,
+                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null,
+                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
+                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
+                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
+                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
+                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
+                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null,
+                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
             ]);
         } catch (\PDOException $e) {
 
