@@ -1,11 +1,10 @@
 <?php
-require('config.php');
-require_once('helper.php');
+
+require 'config.php';
+require_once 'helper.php';
 
 class TransactionModel
 {
-
-
     private $pdo;
     private $host;
     private $dbname;
@@ -18,7 +17,7 @@ class TransactionModel
         $this->dbname = $config['bayarcash_db_dbname'];
         $this->username = $config['bayarcash_db_username'];
         $this->password = $config['bayarcash_db_password'];
-        $charset       = "utf8mb4";
+        $charset = 'utf8mb4';
 
         $dsn = "mysql:host=$this->host;dbname=$this->dbname;charset=$charset";
 
@@ -33,9 +32,9 @@ class TransactionModel
         } catch (\PDOException $e) {
             log_results('CONNECTION TO DB FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
-
 
         $this->pdo = $pdo;
     }
@@ -49,6 +48,7 @@ class TransactionModel
         } catch (\PDOException $e) {
             log_results('GET ALL TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -57,10 +57,10 @@ class TransactionModel
     {
         $status_name_array = [
             get_payment_status_name(0),
-            get_payment_status_name(1)
+            get_payment_status_name(1),
         ];
 
-        $in = str_repeat('?,', count($status_name_array) - 1) . '?';
+        $in = str_repeat('?,', count($status_name_array) - 1).'?';
         $sql = "SELECT * FROM transactions WHERE transaction_status IN ($in) AND DATE(created_at)=curdate()";
 
         try {
@@ -70,9 +70,9 @@ class TransactionModel
 
             return $statement->fetchAll(PDO::FETCH_COLUMN);
         } catch (\PDOException $e) {
-
             log_results('GET NEW TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -81,15 +81,15 @@ class TransactionModel
     {
         $status_name_array = [
             get_payment_status_name(0),
-            get_payment_status_name(1)
+            get_payment_status_name(1),
         ];
 
-        $in = str_repeat('?,', count($status_name_array) - 1) . '?';
+        $in = str_repeat('?,', count($status_name_array) - 1).'?';
         $sql = "SELECT order_ref_no FROM transactions WHERE transaction_status IN ($in) AND DATE(created_at)=curdate()";
 
         $status_name_array = [
             get_payment_status_name(0),
-            get_payment_status_name(1)
+            get_payment_status_name(1),
         ];
 
         try {
@@ -97,9 +97,9 @@ class TransactionModel
 
             $statement->execute($status_name_array);
         } catch (\PDOException $e) {
-
             log_results('GET NEW TRANSACTION ORDER NO FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
 
@@ -109,14 +109,13 @@ class TransactionModel
     public function getSuccessfulTransactions()
     {
         try {
-
             return $this->pdo
-                ->query('SELECT * FROM transactions WHERE transaction_status=' . $this->get_payment_status_name(3))
+                ->query('SELECT * FROM transactions WHERE transaction_status='.$this->get_payment_status_name(3))
                 ->fetchAll();
         } catch (\PDOException $e) {
-
             log_results('GET SUCCESSFULL TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -124,14 +123,13 @@ class TransactionModel
     public function getUnsuccessfulTransactions()
     {
         try {
-
             return $this->pdo
-                ->query('SELECT * FROM transactions WHERE transaction_status' . $this->get_payment_status_name(2))
+                ->query('SELECT * FROM transactions WHERE transaction_status'.$this->get_payment_status_name(2))
                 ->fetchAll();
         } catch (\PDOException $e) {
-
             log_results('GET UNSUCCESSFULL TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -139,7 +137,6 @@ class TransactionModel
     public function init($transaction)
     {
         try {
-
             return $this->pdo->prepare(
                 'INSERT INTO transactions(
                     buyer_ic_no, 
@@ -151,14 +148,14 @@ class TransactionModel
                 :transaction_status
             )'
             )->execute([
-                'buyer_ic_no' => isset($transaction['buyer_ic_no']) ?  $transaction['buyer_ic_no'] : null,
-                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
-                'transaction_status' => $this->get_payment_status_name(0)
+                'buyer_ic_no'        => isset($transaction['buyer_ic_no']) ? $transaction['buyer_ic_no'] : null,
+                'order_no'           => isset($transaction['order_no']) ? $transaction['order_no'] : null,
+                'transaction_status' => $this->get_payment_status_name(0),
             ]);
         } catch (\PDOException $e) {
-
             log_results('INIT TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -177,22 +174,22 @@ class TransactionModel
                 :transaction_datetime, :transaction_gateway_id
             )'
             )->execute([
-                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null,
-                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
-                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
-                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
-                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
-                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
-                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
-                'transaction_status' => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
-                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
-                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
-                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null
+                'order_ref_no'                   => isset($transaction['order_ref_no']) ? $transaction['order_ref_no'] : null,
+                'order_no'                       => isset($transaction['order_no']) ? $transaction['order_no'] : null,
+                'transaction_currency'           => isset($transaction['transaction_currency']) ? $transaction['transaction_currency'] : null,
+                'order_amount'                   => isset($transaction['order_amount']) ? $transaction['order_amount'] : null,
+                'buyer_name'                     => isset($transaction['buyer_name']) ? $transaction['buyer_name'] : null,
+                'buyer_email'                    => isset($transaction['buyer_email']) ? $transaction['buyer_email'] : null,
+                'buyer_bank_name'                => isset($transaction['buyer_bank_name']) ? $transaction['buyer_bank_name'] : null,
+                'transaction_status'             => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ? $transaction['transaction_status_description'] : null,
+                'transaction_datetime'           => isset($transaction['transaction_datetime']) ? $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id'         => isset($transaction['transaction_gateway_id']) ? $transaction['transaction_gateway_id'] : null,
             ]);
         } catch (\PDOException $e) {
-
             log_results('INSERT TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -200,7 +197,6 @@ class TransactionModel
     public function update($transaction)
     {
         try {
-
             return $this->pdo->prepare('
             UPDATE transactions SET
             order_no = :order_no,
@@ -216,22 +212,22 @@ class TransactionModel
             where
             order_ref_no = :order_ref_no
         ')->execute([
-                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
-                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
-                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
-                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
-                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
-                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
-                'transaction_status' => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
-                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
-                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
-                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null,
-                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null
+                'order_no'                       => isset($transaction['order_no']) ? $transaction['order_no'] : null,
+                'transaction_currency'           => isset($transaction['transaction_currency']) ? $transaction['transaction_currency'] : null,
+                'order_amount'                   => isset($transaction['order_amount']) ? $transaction['order_amount'] : null,
+                'buyer_name'                     => isset($transaction['buyer_name']) ? $transaction['buyer_name'] : null,
+                'buyer_email'                    => isset($transaction['buyer_email']) ? $transaction['buyer_email'] : null,
+                'buyer_bank_name'                => isset($transaction['buyer_bank_name']) ? $transaction['buyer_bank_name'] : null,
+                'transaction_status'             => isset($transaction['transaction_status']) ? $this->get_payment_status_name($transaction['transaction_status']) : $this->get_payment_status_name(0),
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ? $transaction['transaction_status_description'] : null,
+                'transaction_datetime'           => isset($transaction['transaction_datetime']) ? $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id'         => isset($transaction['transaction_gateway_id']) ? $transaction['transaction_gateway_id'] : null,
+                'order_ref_no'                   => isset($transaction['order_ref_no']) ? $transaction['order_ref_no'] : null,
             ]);
         } catch (\PDOException $e) {
-
             log_results('UPDATE TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -253,21 +249,21 @@ class TransactionModel
             where
             order_no = :order_no
         ')->execute([
-                'order_ref_no' => isset($transaction['order_ref_no']) ?  $transaction['order_ref_no'] : null,
-                'transaction_currency' => isset($transaction['transaction_currency']) ?  $transaction['transaction_currency'] : null,
-                'order_amount' => isset($transaction['order_amount']) ?  $transaction['order_amount'] : null,
-                'buyer_name' => isset($transaction['buyer_name']) ?  $transaction['buyer_name'] : null,
-                'buyer_email' => isset($transaction['buyer_email']) ?  $transaction['buyer_email'] : null,
-                'buyer_bank_name' => isset($transaction['buyer_bank_name']) ?  $transaction['buyer_bank_name'] : null,
-                'transaction_status_description' => isset($transaction['transaction_status_description']) ?  $transaction['transaction_status_description'] : null,
-                'transaction_datetime' => isset($transaction['transaction_datetime']) ?  $transaction['transaction_datetime'] : null,
-                'transaction_gateway_id' => isset($transaction['transaction_gateway_id']) ?  $transaction['transaction_gateway_id'] : null,
-                'order_no' => isset($transaction['order_no']) ?  $transaction['order_no'] : null,
+                'order_ref_no'                   => isset($transaction['order_ref_no']) ? $transaction['order_ref_no'] : null,
+                'transaction_currency'           => isset($transaction['transaction_currency']) ? $transaction['transaction_currency'] : null,
+                'order_amount'                   => isset($transaction['order_amount']) ? $transaction['order_amount'] : null,
+                'buyer_name'                     => isset($transaction['buyer_name']) ? $transaction['buyer_name'] : null,
+                'buyer_email'                    => isset($transaction['buyer_email']) ? $transaction['buyer_email'] : null,
+                'buyer_bank_name'                => isset($transaction['buyer_bank_name']) ? $transaction['buyer_bank_name'] : null,
+                'transaction_status_description' => isset($transaction['transaction_status_description']) ? $transaction['transaction_status_description'] : null,
+                'transaction_datetime'           => isset($transaction['transaction_datetime']) ? $transaction['transaction_datetime'] : null,
+                'transaction_gateway_id'         => isset($transaction['transaction_gateway_id']) ? $transaction['transaction_gateway_id'] : null,
+                'order_no'                       => isset($transaction['order_no']) ? $transaction['order_no'] : null,
             ]);
         } catch (\PDOException $e) {
-
             log_results('UPDATE TRANSACTION BY ORDER NO FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -284,6 +280,7 @@ class TransactionModel
 
         if ($isTableExist) {
             echo 'transaction table exist';
+
             return;
         }
 
@@ -308,9 +305,9 @@ class TransactionModel
         ) 
         ');
         } catch (\PDOException $e) {
-
             log_results('SETUP TRANSACTION TABLE FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -322,21 +319,21 @@ class TransactionModel
 
             return $statement->execute();
         } catch (\PDOException $e) {
-
             log_results('DROP TABLE TRANSACTION FAILED');
             log_results($e->getMessage());
+
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
 
-    function get_payment_status_name($payment_status_code)
+    public function get_payment_status_name($payment_status_code)
     {
         $payment_status_name_list = [
             'New',
             'Pending',
             'Unsuccessful',
             'Successful',
-            'Cancelled'
+            'Cancelled',
         ];
 
         $is_Id = array_key_exists($payment_status_code, $payment_status_name_list);
