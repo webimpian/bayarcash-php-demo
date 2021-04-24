@@ -1,13 +1,12 @@
 <?php
-require('TransactionModel.php');
-require('config.php');
 
+require 'TransactionModel.php';
+require 'config.php';
 
-if( $_POST['buyer_ic_no'] && $_POST['order_no'] ){
-
+if ($_POST['buyer_ic_no'] && $_POST['order_no']) {
     $post_data = [
         'buyer_ic_no' => $_POST['buyer_ic_no'],
-        'order_no' => $_POST['order_no'],
+        'order_no'    => $_POST['order_no'],
     ];
 
     $transactionModel = new TransactionModel($config);
@@ -15,6 +14,4 @@ if( $_POST['buyer_ic_no'] && $_POST['order_no'] ){
     $status = $transactionModel->init($post_data);
 
     echo $status;
-
-
 }

@@ -1,8 +1,8 @@
 <?php
-require_once('config.php');
+require_once 'config.php';
 
 /**
- * Input required by API
+ * Input required by API.
  * */
 $fpx_portal_key = $config['bayarcash_FPX_portal_key'];
 $return_url = $config['return_url'];
@@ -15,7 +15,7 @@ $buyer_tel = '0168788787';
 $payment_gateway = 1;
 $api_url = $config['bayarcash_api_url'];
 $order_description = 'Pencil';
-$payment_form_id = md5($order_no . time()); # Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
+$payment_form_id = md5($order_no.time()); // Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
 ?>
 
 <html>
