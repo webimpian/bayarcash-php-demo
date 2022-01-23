@@ -21,7 +21,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 <html>
 <head>
 	<title>Bayarcash Checkout Example</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
 <div id="container" class="container col-4 mt-3 mb-4">
@@ -128,8 +128,8 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 </div>
 
 <!-- Footer -->
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="js/TransactionInit.js"></script>
+<script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/TransactionInit.js"></script>
 </body>
 </html>
