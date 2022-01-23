@@ -21,7 +21,7 @@ function get_payment_status_name($payment_status_code)
 
 function log_results($result)
 {
-    // create logs directory if doesn't exist
+    // Create logs directory if doesn't exist.
     if (!is_dir('./logs')) {
         mkdir('./logs');
     }

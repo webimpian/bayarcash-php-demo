@@ -55,12 +55,12 @@ function handlePayment($payment_status, $post_data, $config)
     $transaction = new TransactionModel($config);
 
     if ($payment_status == 'Successful') {
-        $payment_status_message = 'Payment is successful, handle unsuccessful payment from here';
+        $payment_status_message = 'Payment is successful, handle successful payment from here.';
         $transaction->update($post_data);
     }
 
     if ($payment_status == 'Unsuccessful') {
-        $payment_status_message = 'Payment is not successful, handle unsuccessful payment from here';
+        $payment_status_message = 'Payment is unsuccessful, handle unsuccessful payment from here.';
         $transaction->update($post_data);
     }
 
@@ -69,13 +69,13 @@ function handlePayment($payment_status, $post_data, $config)
     echo '<div>Response is in $post_data array </div>';
     echo "<pre>{$post_response}</pre>";
     echo '<br>';
-    echo '<div>To access FPX Transaction ID property</div>';
+    echo '<div>To access FPX Transaction ID property.</div>';
     echo '<br>';
     echo '$post_data[\'order_ref_no\']';
     echo '<br>';
     echo "<pre>{$order_ref_no}</pre>";
     echo '<br>';
-    echo '<div>Please save this FPX Transaction ID for future reference</div>';
+    echo '<div>Please save this FPX Transaction ID for future reference.</div>';
 }
 
 function check_portal_key_valid($portal_key)
