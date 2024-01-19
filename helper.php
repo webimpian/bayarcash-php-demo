@@ -36,3 +36,7 @@ function log_results($result)
 
     file_put_contents('./logs/log_'.date('j.n.Y').'.log', $log, FILE_APPEND);
 }
+
+function dd($var) {
+    return die(var_dump($var));
+}

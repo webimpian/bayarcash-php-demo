@@ -276,12 +276,15 @@ class TransactionModel
 
         $tables = $statement->fetchAll();
 
-        $isTableExist = in_array('transactions', array_values($tables[0]));
 
-        if ($isTableExist) {
-            echo 'transaction table exist';
+        if (count($tables)) {
+            $isTableExist = in_array('transactions', array_values($tables[0]));
 
-            return;
+            if ($isTableExist) {
+                echo 'transaction table exist';
+
+                return;
+            }
         }
 
         try {

@@ -12,8 +12,14 @@ $order_amount = '1.00';
 $buyer_name = 'John Doe';
 $buyer_email = 'hai@bayar.cash';
 $buyer_tel = '0168788787';
-$payment_gateway = 1;
-$api_url = $config['bayarcash_api_url'];
+
+$payment_gateways = [
+	1 => 'FPX',
+	5 => "DuitNow Online Banking <br/>and Wallet",
+];
+
+$environment = $config['environment'];
+$api_url = $config['bayarcash_create_transaction_api_url'][$environment];
 $order_description = 'Pencil';
 $payment_form_id = md5($order_no.time()); // Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
 ?>
@@ -113,15 +119,28 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 					</div>
 				</div>
 
-				<input type="hidden" name="payment_gateway" readonly="true" value="<?php echo $payment_gateway ?>"/>
+				<input type="hidden" name="payment_gateway" id="payment_gateway" readonly="true" value="1"/> <!-- default to FPX -->
 				<input type="hidden" name="return_url" readonly="true" value="<?php echo $return_url ?>"/>
 				<input type="hidden" name="api_url" readonly="true" value="<?php echo $api_url ?>"/>
 				<input type="hidden" name="portal_key" readonly="true" value="<?php echo $fpx_portal_key ?>"/>
 
 				<!-- Submit -->
-				<button class="btn btn-primary mt-2 btn-block" type="submit">
-					Proceed to Payment
-				</button>
+			
+				<!--  Display list of payment channel buttons -->
+				<div class="row">
+
+					<?php foreach($payment_gateways as $id => $label) : ?>
+						<div class="col-6">
+							<button type="submit" 
+								class="btn btn-success btn-block mr-1 h-100"
+								onclick="$('#payment_gateway').val(<?php echo $id; ?>);"
+							>
+								<?php echo $label; ?>
+							</button>
+						</div>
+					<?php endforeach; ?>
+
+				</div>
 			</form>
 		</div>
 	</div>
