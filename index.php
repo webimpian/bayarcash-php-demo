@@ -7,10 +7,10 @@ require_once 'config.php';
 $fpx_portal_key = $config['bayarcash_FPX_portal_key'];
 $return_url = $config['return_url'];
 $buyer_ic_no = '010010010101';
-$order_no = 'ORDER1';
+$order_no = '12345';
 $order_amount = '1.00';
-$buyer_name = 'John Doe';
-$buyer_email = 'hai@bayar.cash';
+$buyer_name = 'Muhammad Ali';
+$buyer_email = 'hai@bayarcash.com';
 $buyer_tel = '0168788787';
 
 $payment_gateways = [
@@ -28,6 +28,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 <head>
 	<title>Bayarcash Checkout Example</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 <div id="container" class="container col-4 mt-3 mb-4">

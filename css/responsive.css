@@ -1,0 +1,5 @@
+@media only screen and (max-width: 767px) {
+    .col-4 {
+        max-width: 100%;
+    }
+}
