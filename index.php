@@ -26,6 +26,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Bayarcash Checkout Example</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/responsive.css">
