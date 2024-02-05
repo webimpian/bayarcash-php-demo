@@ -2,4 +2,10 @@
     .col-4 {
         max-width: 100%!important;
     }
+
+    .col-6.button {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
 }
