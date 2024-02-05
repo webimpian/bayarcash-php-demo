@@ -46,8 +46,9 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 				<div class="card-text">
 					<div class="row">
 						<div class="col">
+
 							<!-- ID Number -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-2 display-none">
 								<label class="mb-1" for="order_no">
 									<b>Buyer IC Number</b>
 								</label>
