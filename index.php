@@ -20,7 +20,7 @@ $payment_gateways = [
 
 $environment = $config['environment'];
 $api_url = $config['bayarcash_create_transaction_api_url'][$environment];
-$order_description = 'Pencil';
+$order_description = 'Bayaran Zakat Harta';
 $payment_form_id = md5($order_no.time()); // Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
 ?>
 
