@@ -49,7 +49,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 						<div class="col">
 
 							<!-- ID Number -->
-							<div class="form-group mb-2" style="display:none;">
+							<div class="form-group mb-3" style="display:none;">
 								<label class="mb-1" for="order_no">
 									<b>Buyer IC Number</b>
 								</label>
@@ -59,7 +59,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- ID Number -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="order_no">
 									<b>ID Number</b>
 								</label>
@@ -69,7 +69,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- Amount -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="order_amount">
 									<b>Amount</b>
 								</label>
@@ -79,7 +79,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- Description -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="order_description">
 									<b>Description</b>
 								</label>
@@ -89,7 +89,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- Name -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="buyer_name">
 									<b>Name</b>
 								</label>
@@ -99,7 +99,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- Email -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="buyer_email">
 									<b>Email</b>
 								</label>
@@ -109,7 +109,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 							</div>
 
 							<!-- Telephone -->
-							<div class="form-group mb-2">
+							<div class="form-group mb-3">
 								<label class="mb-1" for="buyer_tel">
 									<b>Telephone</b>
 								</label>
