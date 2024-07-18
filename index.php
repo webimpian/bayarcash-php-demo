@@ -129,6 +129,8 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 				<input type="hidden" name="api_url" readonly="true" value="<?php echo $api_url ?>"/>
 				<input type="hidden" name="portal_key" readonly="true" value="<?php echo $fpx_portal_key ?>"/>
 
+                <hr>
+
 				<!-- Submit -->
 				<!--  Display list of payment channel buttons -->
 				<div class="row mt-2">
