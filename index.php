@@ -32,6 +32,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/desktop.css">
+    <script src="https://kit.fontawesome.com/fdd718b065.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
@@ -138,6 +139,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 						<div class="col-12 button mb-3">
 							<button type="submit" class="btn btn-success btn-block mr-1 h-100 p-2" onclick="$('#payment_gateway').val(<?php echo $id; ?>);">
 								<?php echo $label; ?>
+                                <i class="fa-duotone fa-solid fa-arrow-right"></i>
 							</button>
 						</div>
 					<?php endforeach; ?>
