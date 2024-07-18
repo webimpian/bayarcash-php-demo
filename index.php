@@ -27,18 +27,19 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Bayarcash Checkout Example</title>
+	<title>Bayarcash Checkout Example Using v1 API Endpoint</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/desktop.css">
 </head>
 <body>
-<div id="container" class="container col-4 mt-3 mb-4">
+<div id="container" class="container col-4 mt-3 mb-4 container-width">
 	<div class="mb-3">
 		<a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
 			Reference from GitHub repo
 		</a>
 	</div>
-	<div class="card">
+	<div class="card shadow">
 		<div class="card-header">
 			Transaction Details
 		</div>

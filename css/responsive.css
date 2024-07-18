@@ -1,4 +1,9 @@
 @media only screen and (max-width: 767px) {
+
+    .container-width {
+        width: 100%;
+    }
+
     .col-4 {
         max-width: 100%!important;
     }
