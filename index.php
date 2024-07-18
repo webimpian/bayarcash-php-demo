@@ -139,7 +139,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 						<div class="col-12 button mb-2">
 							<button type="submit" class="btn btn-success btn-block mr-1 h-100 p-2" onclick="$('#payment_gateway').val(<?php echo $id; ?>);">
 								<?php echo $label; ?>
-                                <i class="fa-duotone fa-solid fa-arrow-right"></i>
+                                <i class="fa-duotone fa-solid fa-arrow-right ml-2"></i>
 							</button>
 						</div>
 					<?php endforeach; ?>
