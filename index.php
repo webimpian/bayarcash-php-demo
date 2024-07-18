@@ -134,9 +134,9 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 
 				<!-- Submit -->
 				<!--  Display list of payment channel buttons -->
-				<div class="row mt-2">
+				<div class="row mt-4">
 					<?php foreach($payment_gateways as $id => $label) : ?>
-						<div class="col-12 button mb-3">
+						<div class="col-12 button mb-2">
 							<button type="submit" class="btn btn-success btn-block mr-1 h-100 p-2" onclick="$('#payment_gateway').val(<?php echo $id; ?>);">
 								<?php echo $label; ?>
                                 <i class="fa-duotone fa-solid fa-arrow-right"></i>
