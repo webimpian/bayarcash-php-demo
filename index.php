@@ -14,8 +14,8 @@ $buyer_email = 'hai@bayarcash.com';
 $buyer_tel = '0168788787';
 
 $payment_gateways = [
-	1 => 'FPX',
-	5 => "DuitNow",
+	1 => 'FPX (Current & Saving Account)',
+	5 => "DuitNow Online Banking/Wallets",
 ];
 
 $environment = $config['environment'];
@@ -132,7 +132,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 				<!--  Display list of payment channel buttons -->
 				<div class="row mt-3">
 					<?php foreach($payment_gateways as $id => $label) : ?>
-						<div class="col-6 button">
+						<div class="col-12 button mb-3">
 							<button type="submit" class="btn btn-success btn-block mr-1 h-100 p-2" onclick="$('#payment_gateway').val(<?php echo $id; ?>);">
 								<?php echo $label; ?>
 							</button>
