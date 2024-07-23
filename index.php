@@ -15,7 +15,7 @@ $buyer_tel = '0168788787';
 
 $payment_gateways = [
 	1 => 'FPX Online Banking (CASA)',
-	4 => 'FPX Line of Credit (Card Credit)',
+	4 => 'FPX Line of Credit (Credit Card)',
 	5 => "DuitNow Online Banking/Wallets",
 ];
 
