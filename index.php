@@ -42,7 +42,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
                 Reference from GitHub repo
             </a>
         </div>
-        <div class="mt-2">
+        <div class="mt-1">
             <a target="_blank" href="https://api.webimpian.support/bayarcash">
                 API Documentation
             </a>
