@@ -4,7 +4,7 @@ require_once 'config.php';
 require_once 'TransactionModel.php';
 require_once 'helper.php';
 
-$bearer_token = $config['bayarcash_FPX_bearer_token'];
+$bearer_token = $config['bayarcash_bearer_token'];
 
 /**
  * Query from DB for order that have the status 'pending order' preferably for today only here,

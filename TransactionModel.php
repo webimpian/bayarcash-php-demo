@@ -30,7 +30,7 @@ class TransactionModel
         try {
             $pdo = new PDO($dsn, $this->username, $this->password, $options);
         } catch (\PDOException $e) {
-            log_results('CONNECTION TO DB FAILED');
+            log_results('Connection to database failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -46,7 +46,7 @@ class TransactionModel
                 ->query('SELECT * FROM transactions')
                 ->fetchAll();
         } catch (\PDOException $e) {
-            log_results('GET ALL TRANSACTION FAILED');
+            log_results('Get all transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -70,7 +70,7 @@ class TransactionModel
 
             return $statement->fetchAll(PDO::FETCH_COLUMN);
         } catch (\PDOException $e) {
-            log_results('GET NEW TRANSACTION FAILED');
+            log_results('Get new transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -97,7 +97,7 @@ class TransactionModel
 
             $statement->execute($status_name_array);
         } catch (\PDOException $e) {
-            log_results('GET NEW TRANSACTION ORDER NO FAILED');
+            log_results('Get new transaction order number failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -113,7 +113,7 @@ class TransactionModel
                 ->query('SELECT * FROM transactions WHERE transaction_status='.$this->get_payment_status_name(3))
                 ->fetchAll();
         } catch (\PDOException $e) {
-            log_results('GET SUCCESSFULL TRANSACTION FAILED');
+            log_results('Get successful transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -127,7 +127,7 @@ class TransactionModel
                 ->query('SELECT * FROM transactions WHERE transaction_status'.$this->get_payment_status_name(2))
                 ->fetchAll();
         } catch (\PDOException $e) {
-            log_results('GET UNSUCCESSFULL TRANSACTION FAILED');
+            log_results('Get unsuccessful transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -153,7 +153,7 @@ class TransactionModel
                 'transaction_status' => $this->get_payment_status_name(0),
             ]);
         } catch (\PDOException $e) {
-            log_results('INIT TRANSACTION FAILED');
+            log_results('Init transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -187,7 +187,7 @@ class TransactionModel
                 'transaction_gateway_id'         => isset($transaction['transaction_gateway_id']) ? $transaction['transaction_gateway_id'] : null,
             ]);
         } catch (\PDOException $e) {
-            log_results('INSERT TRANSACTION FAILED');
+            log_results('Insert transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -225,7 +225,7 @@ class TransactionModel
                 'order_ref_no'                   => isset($transaction['order_ref_no']) ? $transaction['order_ref_no'] : null,
             ]);
         } catch (\PDOException $e) {
-            log_results('UPDATE TRANSACTION FAILED');
+            log_results('Update transaction failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -261,7 +261,7 @@ class TransactionModel
                 'order_no'                       => isset($transaction['order_no']) ? $transaction['order_no'] : null,
             ]);
         } catch (\PDOException $e) {
-            log_results('UPDATE TRANSACTION BY ORDER NO FAILED');
+            log_results('Update transaction by order number failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
@@ -281,7 +281,7 @@ class TransactionModel
             $isTableExist = in_array('transactions', array_values($tables[0]));
 
             if ($isTableExist) {
-                echo 'transaction table exist';
+                echo 'Transaction table exist';
 
                 return;
             }
@@ -308,7 +308,7 @@ class TransactionModel
         ) 
         ');
         } catch (\PDOException $e) {
-            log_results('SETUP TRANSACTION TABLE FAILED');
+            log_results('Setup transaction table failed');
             log_results($e->getMessage());
 
             throw new \PDOException($e->getMessage(), (int) $e->getCode());

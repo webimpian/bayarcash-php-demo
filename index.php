@@ -4,7 +4,7 @@ require_once 'config.php';
 /**
  * Input required by API.
  * */
-$fpx_portal_key = $config['bayarcash_FPX_portal_key'];
+$fpx_portal_key = $config['bayarcash_portal_key'];
 $return_url = $config['return_url'];
 $buyer_ic_no = '010010010101';
 $order_no = '12345';
@@ -40,6 +40,10 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 		<a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
 			Reference from GitHub repo
 		</a>
+        <br>
+        <a target="_blank" href="https://api.webimpian.support/bayarcash">
+            API Documentation
+        </a>
 	</div>
 	<div class="card shadow">
 		<div class="card-header">
