@@ -8,7 +8,7 @@ $config['bayarcash_create_transaction_api_url'] = [
 	'production' => 'https://console.bayar.cash/transactions/add',
 ];
 $config['bayarcash_requery_transaction_status_api_url'] = [
-	'dev' => 'https://console.bayarcash-sandbox.com/api/transactions/?RefNo=',
+	'sandbox' => 'https://console.bayarcash-sandbox.com/api/transactions/?RefNo=',
 	'production' => 'https://console.bayar.cash/api/transactions/?RefNo=',
 ];
 

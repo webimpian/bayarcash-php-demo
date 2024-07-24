@@ -1,28 +1,27 @@
 <?php
-require_once 'config.php';
+    require_once 'config.php';
 
-/**
- * Input required by API.
- * */
-$fpx_portal_key = $config['bayarcash_portal_key'];
-$return_url = $config['return_url'];
-$buyer_ic_no = '010010010101';
-$order_no = '12345';
-$order_amount = '1.00';
-$buyer_name = 'Muhammad Ali';
-$buyer_email = 'hai@bayarcash.com';
-$buyer_tel = '0168788787';
+    /**
+     * Input required by API.
+     * */
+    $bayarcash_portal_key = $config['bayarcash_portal_key'];
+    $return_url = $config['return_url'];
+    $order_no = '12345';
+    $order_amount = '1.00';
+    $buyer_name = 'Muhammad Ali';
+    $buyer_email = 'hai@bayarcash.com';
+    $buyer_tel = '60168788787';
 
-$payment_gateways = [
-	1 => 'FPX Online Banking (CASA)',
-	4 => 'FPX Line of Credit (Credit Card)',
-	5 => "DuitNow Online Banking/Wallets",
-];
+    $payment_gateways = [
+        1 => 'FPX Online Banking (CASA)',
+        4 => 'FPX Line of Credit (Credit Card)',
+        5 => "DuitNow Online Banking/Wallets",
+    ];
 
-$environment = $config['environment'];
-$api_url = $config['bayarcash_create_transaction_api_url'][$environment];
-$order_description = 'Bayaran Zakat Harta';
-$payment_form_id = md5($order_no.time()); // Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
+    $environment = $config['environment'];
+    $api_url = $config['bayarcash_create_transaction_api_url'][$environment];
+    $order_description = 'Bayaran Zakat Harta';
+    $payment_form_id = md5($order_no.time()); // Safety features: Generate and assign a dynamic form ID in order to prevent any automation on the client-side.
 ?>
 
 <html>
@@ -58,16 +57,6 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 				<div class="card-text">
 					<div class="row">
 						<div class="col">
-
-							<!-- ID Number -->
-							<div class="form-group mb-3">
-								<label class="mb-1" for="order_no">
-									<b>Buyer IC Number</b>
-								</label>
-								<div>
-									<input type="text" name="buyer_ic_no" id="buyer_ic_no" class="form-control" value="<?php echo $buyer_ic_no ?>" required>
-								</div>
-							</div>
 
 							<!-- ID Number -->
 							<div class="form-group mb-3">
@@ -135,7 +124,7 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 				<input type="hidden" name="payment_gateway" id="payment_gateway" readonly="true" value="1"/> <!-- default to FPX -->
 				<input type="hidden" name="return_url" readonly="true" value="<?php echo $return_url ?>"/>
 				<input type="hidden" name="api_url" readonly="true" value="<?php echo $api_url ?>"/>
-				<input type="hidden" name="portal_key" readonly="true" value="<?php echo $fpx_portal_key ?>"/>
+				<input type="hidden" name="portal_key" readonly="true" value="<?php echo $bayarcash_portal_key ?>"/>
 
                 <hr>
 
@@ -159,6 +148,5 @@ $payment_form_id = md5($order_no.time()); // Safety features: Generate and assig
 <!-- Footer -->
 <script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/TransactionInit.js"></script>
 </body>
 </html>
