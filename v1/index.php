@@ -1,5 +1,5 @@
 <?php
-    require_once 'config.php';
+    require_once '../config-v1.php';
 
     /**
      * Input required by API.
