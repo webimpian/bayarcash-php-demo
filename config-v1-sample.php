@@ -1,6 +1,6 @@
 <?php
 
-$config['base_url'] = 'https://php.bayarcash-demo.com/';
+$config['base_url'] = 'https://php.bayarcash-demo.com/v1/';
 $config['return_url'] = $config['base_url'].'return.php';
 $config['environment'] = 'production';
 $config['bayarcash_create_transaction_api_url'] = [
