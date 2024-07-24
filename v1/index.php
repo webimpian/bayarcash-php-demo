@@ -38,12 +38,12 @@
 	<div class="mb-3">
 		<div>
             <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
-                Reference from GitHub repo
+                Reference from GitHub repo &#187;
             </a>
         </div>
         <div class="mt-1">
             <a target="_blank" href="https://api.webimpian.support/bayarcash">
-                API Documentation
+                Bayarcash API documentation &#187;
             </a>
         </div>
 	</div>
