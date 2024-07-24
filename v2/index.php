@@ -1,0 +1,1 @@
+Bayarcash v2 API endpoint.
