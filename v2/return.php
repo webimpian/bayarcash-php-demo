@@ -159,7 +159,7 @@ function handleTransaction($data, $transaction) {
 
 <?php if (isset($callbackData['status'])): ?>
     <h3>Payment Status:</h3>
-    <p style="background-color: <?php echo $callbackData['status'] === '00' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
+    <p style="background-color: <?php echo $callbackData['status'] === '3' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
         <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
     </p>
 <?php endif; ?>
