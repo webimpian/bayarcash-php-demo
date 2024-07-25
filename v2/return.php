@@ -128,6 +128,10 @@ function handleTransaction($data, $transaction) {
         .success { color: green; }
         .error { color: red; }
         .info { color: blue; }
+        .message { font-size: 1.2em; margin: 20px 0; padding: 10px; border-radius: 5px; }
+        .message.success { background-color: #e0f7e0; border: 1px solid #5cb85c; }
+        .message.error { background-color: #f7e0e0; border: 1px solid #d9534f; }
+        .message.info { background-color: #e0eaf7; border: 1px solid #5bc0de; }
     </style>
 </head>
 <body>
@@ -141,7 +145,9 @@ function handleTransaction($data, $transaction) {
         <?php echo ucfirst($response['status']); ?>
     </span></h2>
 
-<p><strong>Message:</strong> <?php echo $response['message']; ?></p>
+<div class="message <?php echo $response['status']; ?>">
+    <strong>Message:</strong> <?php echo $response['message']; ?>
+</div>
 
 <h3>Callback Data:</h3>
 <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
@@ -153,8 +159,9 @@ function handleTransaction($data, $transaction) {
 
 <?php if (isset($callbackData['status'])): ?>
     <h3>Payment Status:</h3>
-    <p><?php echo get_payment_status_name($callbackData['status']); ?></p>
-    <p><?php echo $callbackData['status_description']; ?></p>
+    <p style="background-color: <?php echo $callbackData['status'] === '00' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
+        <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
+    </p>
 <?php endif; ?>
 
 </body>
