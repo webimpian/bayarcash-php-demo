@@ -1,13 +1,16 @@
 <?php
 global $config;
-require_once '../config-v2.php';
+require_once '../config-v2.php'; // Ensure this path points to your configuration file
 require_once 'vendor/autoload.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
 use Webimpian\BayarcashSdk\Exceptions\ValidationException;
 
+// Get the current configuration based on the environment
+$current_config = getConfig($config, $config['environment']);
+
 // Initialize Bayarcash SDK
-$bayarcash = new Bayarcash($config['bayarcash_bearer_token']);
+$bayarcash = new Bayarcash($current_config['bayarcash_bearer_token']);
 if ($config['environment'] === 'sandbox') {
     $bayarcash->useSandbox();
 }
@@ -36,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $data = [
-            'portal_key' => $config['bayarcash_portal_key'],
+            'portal_key' => $current_config['bayarcash_portal_key'],
             'order_number' => $order_no,
             'amount' => $order_amount,
             'payer_name' => $buyer_name,
@@ -57,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'payer_email' => $data['payer_email'],
         ];
 
-        $data['checksum'] = $bayarcash->createChecksumValue($config['bayarcash_api_secret_key'], $checksumPayload);
+        $data['checksum'] = $bayarcash->createChecksumValue($current_config['bayarcash_api_secret_key'], $checksumPayload);
 
         $response = $bayarcash->createPaymentIntent($data);
 
@@ -79,3 +82,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Include the view file
 include 'checkout.php';
+?>

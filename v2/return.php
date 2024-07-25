@@ -7,6 +7,9 @@ require_once 'helper.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
 
+// Get the current configuration based on the environment
+$current_config = getConfig($config, $config['environment']);
+
 $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 $tableCreated = false;
 
@@ -16,7 +19,7 @@ try {
         $bayarcashSdk->useSandbox();
     }
 
-    $apiSecretKey = $config['bayarcash_api_secret_key'];
+    $apiSecretKey = $current_config['bayarcash_api_secret_key'];
     $callbackData = $_POST;
     $validResponse = false;
 
