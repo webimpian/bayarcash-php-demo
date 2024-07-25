@@ -19,7 +19,7 @@ if (isset($_POST['fpx_pre_transaction_data'])) {
 }
 
 if (isset($_POST['fpx_data'])) {
-    $is_portal_key_valid = check_portal_key_valid($config['bayarcash_FPX_portal_key']);
+    $is_portal_key_valid = check_portal_key_valid($config['bayarcash_portal_key']);
 
     if (!$is_portal_key_valid) {
         exit('Mismatched data.');
