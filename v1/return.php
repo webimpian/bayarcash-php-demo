@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config-v1.php';
+require_once './../config-v1.php';
 require_once 'TransactionModel.php';
 require_once 'helper.php';
 
@@ -42,6 +42,59 @@ if (isset($_POST['fpx_data'])) {
     $payment_status = get_payment_status_name($post_data['transaction_status']);
 
     handlePayment($payment_status, $post_data, $config);
+}
+
+// DOBW Callback
+if (isset($_POST['record_type']) && $_POST['record_type'] === 'transaction_receipt') {
+    $secret_key = $config['bayarcash_api_secret_key'];
+
+    if (! verify_dobw_transaction_callback($_POST, $secret_key)) {
+        exit('Mismatched data.');
+    }
+
+    $post_data = [
+        'order_ref_no'                   => $_POST['exchange_reference_number'],
+        'order_no'                       => $_POST['order_no'],
+        'transaction_currency'           => $_POST['currency'],
+        'order_amount'                   => $_POST['amount'],
+        'buyer_name'                     => $_POST['payer_name'],
+        'buyer_email'                    => $_POST['payer_email'],
+        'buyer_bank_name'                => $_POST['payer_bank_name'],
+        'transaction_status'             => $_POST['status'],
+        'transaction_status_description' => $_POST['status_description'],
+        'transaction_datetime'           => $_POST['datetime'],
+        'transaction_gateway_id'         => $_POST['exchange_transaction_id'],
+    ];
+
+    $payment_status = get_payment_status_name($post_data['status']);
+
+    handlePayment($payment_status, $post_data, $config);
+}
+
+function verify_dobw_transaction_callback(array $callbackData, string $secretKey)
+{
+    $callbackChecksum = $callbackData['checksum'];
+
+    $payload = [
+        'record_type' => $callbackData['record_type'],
+        'transaction_id' => $callbackData['transaction_id'],
+        'exchange_reference_number' => $callbackData['exchange_reference_number'],
+        'exchange_transaction_id' => $callbackData['exchange_transaction_id'],
+        'order_number' => $callbackData['order_number'],
+        'currency' => $callbackData['currency'],
+        'amount' => $callbackData['amount'],
+        'payer_name' => $callbackData['payer_name'],
+        'payer_email' => $callbackData['payer_email'],
+        'payer_bank_name' => $callbackData['payer_bank_name'],
+        'status' => $callbackData['status'],
+        'status_description' => $callbackData['status_description'],
+        'datetime' => $callbackData['datetime'],
+    ];
+
+    ksort($payload);
+    $payload = implode('|', $payload);
+
+    return hash_hmac('sha256', $payload, $secretKey) === $callbackChecksum;
 }
 
 function handlePayment($payment_status, $post_data, $config)
