@@ -1,0 +1,8 @@
+body {
+    background: #eee;
+}
+
+.container-width {
+    width: 600px;
+    min-width: 600px;
+}
