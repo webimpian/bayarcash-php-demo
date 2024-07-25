@@ -14,7 +14,7 @@ $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 $tableCreated = false;
 
 try {
-    $bayarcashSdk = new Bayarcash($config['bayarcash_bearer_token']);
+    $bayarcashSdk = new Bayarcash($current_config['bayarcash_bearer_token']);
     if ($config['environment'] === 'sandbox') {
         $bayarcashSdk->useSandbox();
     }
