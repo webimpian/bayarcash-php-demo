@@ -37,6 +37,9 @@ class TransactionModel
         }
 
         $this->pdo = $pdo;
+
+        // Check if the table exists, if not, create it
+        $this->ensureTableExists();
     }
 
     public function getAll()
@@ -270,47 +273,30 @@ class TransactionModel
 
     public function setup()
     {
-        $statement = $this->pdo->prepare('SHOW TABLES LIKE \'transactions\'');
-
-        $statement->execute();
-
-        $tables = $statement->fetchAll();
-
-
-        if (count($tables)) {
-            $isTableExist = in_array('transactions', array_values($tables[0]));
-
-            if ($isTableExist) {
-                echo 'Transaction table exist';
-
-                return;
-            }
-        }
-
         try {
-            $this->pdo->query('
-        CREATE TABLE transactions (
-         id int NOT NULL AUTO_INCREMENT,
-         buyer_ic_no VARCHAR(50),
-         order_no VARCHAR(50),
-         transaction_currency VARCHAR(50), 
-         order_amount VARCHAR(50), 
-         buyer_name VARCHAR(50),
-         buyer_email VARCHAR(50),
-         buyer_bank_name VARCHAR(50),
-         transaction_status VARCHAR(50),
-         transaction_status_description VARCHAR(255),
-         transaction_datetime VARCHAR(50),
-         transaction_gateway_id VARCHAR(50),
-         order_ref_no VARCHAR(50),
-         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-         PRIMARY KEY (id)
-        ) 
+            $this->pdo->exec('
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INT NOT NULL AUTO_INCREMENT,
+                buyer_ic_no VARCHAR(50),
+                order_no VARCHAR(50),
+                transaction_currency VARCHAR(50), 
+                order_amount VARCHAR(50), 
+                buyer_name VARCHAR(50),
+                buyer_email VARCHAR(50),
+                buyer_bank_name VARCHAR(50),
+                transaction_status VARCHAR(50),
+                transaction_status_description VARCHAR(255),
+                transaction_datetime VARCHAR(50),
+                transaction_gateway_id VARCHAR(50),
+                order_ref_no VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (id)
+            ) 
         ');
+            echo 'Transaction table created successfully';
         } catch (\PDOException $e) {
             log_results('Setup transaction table failed');
             log_results($e->getMessage());
-
             throw new \PDOException($e->getMessage(), (int) $e->getCode());
         }
     }
@@ -346,5 +332,16 @@ class TransactionModel
         }
 
         return $payment_status_name_list[$payment_status_code];
+    }
+
+    private function ensureTableExists()
+    {
+        $statement = $this->pdo->prepare('SHOW TABLES LIKE \'transactions\'');
+        $statement->execute();
+        $tableExists = $statement->rowCount() > 0;
+
+        if (!$tableExists) {
+            $this->setup();
+        }
     }
 }
