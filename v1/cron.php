@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config-v1.php';
+require_once './../config-v1.php';
 require_once 'TransactionModel.php';
 require_once 'helper.php';
 

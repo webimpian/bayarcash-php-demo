@@ -1,6 +1,6 @@
 <?php
 
-require 'config-v1.php';
+require './../config-v1.php';
 require_once 'helper.php';
 
 class TransactionModel
