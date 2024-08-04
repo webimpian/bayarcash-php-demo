@@ -162,11 +162,11 @@ function handleTransaction($data, $transaction) {
                 <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
             </div>
 
-            <hr class="mt-3 mb-3">
+            <hr class="mt-4 mb-4">
 
             <!-- Callback data -->
             <div>
-                <h5 class="font-weight-bold">
+                <h5 class="font-weight-bold mb-2">
                     Callback Data
                 </h5>
                 <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
@@ -178,11 +178,11 @@ function handleTransaction($data, $transaction) {
                 <p>Please save this exchange reference number for future reference.</p>
             <?php endif; ?>
 
-            <hr class="mt-3 mb-3">
+            <hr class="mt-4 mb-4">
 
             <!-- Payment status -->
             <?php if (isset($callbackData['status'])): ?>
-                <h5 class="font-weight-bold">
+                <h5 class="font-weight-bold mb-2">
                     Payment Status
                 </h5>
                 <div class="alert <?php echo $callbackData['status'] === '3' ? 'alert-success' : 'alert-danger'; ?>">
