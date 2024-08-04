@@ -6,3 +6,9 @@ body {
     width: 600px;
     min-width: 600px;
 }
+
+pre {
+    background: black;
+    color: green;
+    line-height: 26px;
+}
