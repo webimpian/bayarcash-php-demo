@@ -120,49 +120,41 @@ function handleTransaction($data, $transaction) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Callback Response</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-        h1 { color: #333; }
-        pre { background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
-        .success { color: green; }
-        .error { color: red; }
-        .info { color: blue; }
-        .message { font-size: 1.2em; margin: 20px 0; padding: 10px; border-radius: 5px; }
-        .message.success { background-color: #e0f7e0; border: 1px solid #5cb85c; }
-        .message.error { background-color: #f7e0e0; border: 1px solid #d9534f; }
-        .message.info { background-color: #e0eaf7; border: 1px solid #5bc0de; }
-    </style>
+    <title>Bayarcash Payment Callback Response</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/desktop.css">
+    <script src="https://kit.fontawesome.com/fdd718b065.js" crossorigin="anonymous"></script>
 </head>
 <body>
+<div id="container" class="container col-4 mt-3 mb-4 container-width">
 <h1>Payment Callback Response</h1>
+    <?php if ($tableCreated): ?>
+        <p class="info"><strong>Info:</strong> Transactions table was created in the database.</p>
+    <?php endif; ?>
 
-<?php if ($tableCreated): ?>
-    <p class="info"><strong>Info:</strong> Transactions table was created in the database.</p>
-<?php endif; ?>
+    <h2>
+        Status: <span class="<?php echo $response['status'] === 'success' ? 'success' : 'error'; ?>"><?php echo ucfirst($response['status']); ?></span>
+    </h2>
 
-<h2>Status: <span class="<?php echo $response['status'] === 'success' ? 'success' : 'error'; ?>">
-        <?php echo ucfirst($response['status']); ?>
-    </span></h2>
+    <div class="message <?php echo $response['status']; ?>">
+        <strong>Message:</strong> <?php echo $response['message']; ?>
+    </div>
 
-<div class="message <?php echo $response['status']; ?>">
-    <strong>Message:</strong> <?php echo $response['message']; ?>
+    <h3>Callback Data:</h3>
+    <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
+
+    <?php if (isset($callbackData['exchange_reference_number'])): ?>
+        <p><strong>FPX Transaction ID (exchange_reference_number):</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
+        <p>Please save this FPX Transaction ID for future reference.</p>
+    <?php endif; ?>
+
+    <?php if (isset($callbackData['status'])): ?>
+        <h3>Payment Status:</h3>
+        <p style="background-color: <?php echo $callbackData['status'] === '3' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
+            <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
+        </p>
+    <?php endif; ?>
 </div>
-
-<h3>Callback Data:</h3>
-<pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
-
-<?php if (isset($callbackData['exchange_reference_number'])): ?>
-    <p><strong>FPX Transaction ID (exchange_reference_number):</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
-    <p>Please save this FPX Transaction ID for future reference.</p>
-<?php endif; ?>
-
-<?php if (isset($callbackData['status'])): ?>
-    <h3>Payment Status:</h3>
-    <p style="background-color: <?php echo $callbackData['status'] === '3' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
-        <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
-    </p>
-<?php endif; ?>
-
 </body>
 </html>
