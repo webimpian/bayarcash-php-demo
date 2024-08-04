@@ -162,9 +162,7 @@ function handleTransaction($data, $transaction) {
                 <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
             </div>
 
-            <br>
-            <hr>
-            <br>
+            <hr class="mt-3 mb-3">
 
             <!-- Callback data -->
             <div>
@@ -180,9 +178,7 @@ function handleTransaction($data, $transaction) {
                 <p>Please save this exchange reference number for future reference.</p>
             <?php endif; ?>
 
-            <br>
-            <hr>
-            <br>
+            <hr class="mt-3 mb-3">
 
             <!-- Payment status -->
             <?php if (isset($callbackData['status'])): ?>
