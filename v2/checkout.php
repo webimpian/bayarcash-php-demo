@@ -65,6 +65,8 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     </div>
 </div>
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
+
+    <!-- Reference -->
     <div class="mb-3">
         <div>
             <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
@@ -77,6 +79,8 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
             </a>
         </div>
     </div>
+
+    <!-- Alert -->
     <?php if ($error_message): ?>
         <div class="alert alert-danger" role="alert">
             <?php echo htmlspecialchars($error_message); ?>
@@ -89,6 +93,8 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
             <?php endif; ?>
         </div>
     <?php endif; ?>
+
+    <!-- Card -->
     <div class="card shadow">
         <div class="card-header">
             Transaction Details
@@ -148,6 +154,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     </div>
 </div>
 
+<!-- JS -->
 <script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script>
@@ -168,6 +175,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     // Check if we're returning from payment site
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
+
             // Page is loaded from cache (user pressed back button)
             document.getElementById('loading-overlay').style.display = 'none';
         }

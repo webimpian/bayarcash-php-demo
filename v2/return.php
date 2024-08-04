@@ -128,33 +128,71 @@ function handleTransaction($data, $transaction) {
 </head>
 <body>
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
-<h1>Payment Callback Response</h1>
-    <?php if ($tableCreated): ?>
-        <p class="info"><strong>Info:</strong> Transactions table was created in the database.</p>
-    <?php endif; ?>
 
-    <h2>
-        Status: <span class="<?php echo $response['status'] === 'success' ? 'success' : 'error'; ?>"><?php echo ucfirst($response['status']); ?></span>
-    </h2>
-
-    <div class="message <?php echo $response['status']; ?>">
-        <strong>Message:</strong> <?php echo $response['message']; ?>
+    <!-- Reference -->
+    <div class="mb-3">
+        <div>
+            <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
+                Reference from GitHub repo &#187;
+            </a>
+        </div>
+        <div class="mt-1">
+            <a target="_blank" href="https://api.webimpian.support/bayarcash">
+                Bayarcash API documentation &#187;
+            </a>
+        </div>
     </div>
 
-    <h3>Callback Data:</h3>
-    <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
+    <!-- Card -->
+    <div class="card shadow">
+        <div class="card-header">
+            Payment Callback Response
+        </div>
+        <div class="card-body">
 
-    <?php if (isset($callbackData['exchange_reference_number'])): ?>
-        <p><strong>FPX Transaction ID (exchange_reference_number):</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
-        <p>Please save this FPX Transaction ID for future reference.</p>
-    <?php endif; ?>
+            <!-- TransactionModel -->
+            <?php if ($tableCreated): ?>
+                <div class="alert-info">
+                    <strong>Info:</strong> Transactions table was created in the database.
+                </div>
+            <?php endif; ?>
 
-    <?php if (isset($callbackData['status'])): ?>
-        <h3>Payment Status:</h3>
-        <p style="background-color: <?php echo $callbackData['status'] === '3' ? '#e0f7e0' : '#f7e0e0'; ?>; padding: 10px; border-radius: 5px;">
-            <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
-        </p>
-    <?php endif; ?>
+            <!-- Status -->
+            <div class="alert <?php echo $response['status'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
+            </div>
+
+            <hr>
+
+            <!-- Callback data -->
+            <div>
+                <h5 class="font-weight-bold">
+                    Callback Data
+                </h5>
+                <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
+            </div>
+
+            <!-- Exchange reference number -->
+            <?php if (isset($callbackData['exchange_reference_number'])): ?>
+                <p><strong>Exchange Reference Number:</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
+                <p>Please save this exchange reference number for future reference.</p>
+            <?php endif; ?>
+
+            <!-- Payment status -->
+            <?php if (isset($callbackData['status'])): ?>
+                <h5 class="font-weight-bold">
+                    Payment Status
+                </h5>
+                <div class="alert <?php echo $callbackData['status'] === '3' ? 'alert-success' : 'alert-danger'; ?>">
+                    <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
+
+<!-- JS -->
+<script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
 </body>
 </html>
