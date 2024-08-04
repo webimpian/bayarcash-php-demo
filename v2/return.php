@@ -166,7 +166,7 @@ function handleTransaction($data, $transaction) {
 
             <!-- Callback data -->
             <div>
-                <h5 class="font-weight-bold mb-2">
+                <h5 class="font-weight-bold mb-3">
                     Callback Data
                 </h5>
                 <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
@@ -182,7 +182,7 @@ function handleTransaction($data, $transaction) {
 
             <!-- Payment status -->
             <?php if (isset($callbackData['status'])): ?>
-                <h5 class="font-weight-bold mb-2">
+                <h5 class="font-weight-bold mb-3">
                     Payment Status
                 </h5>
                 <div class="alert <?php echo $callbackData['status'] === '3' ? 'alert-success' : 'alert-danger'; ?>">
