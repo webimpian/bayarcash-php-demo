@@ -3,6 +3,7 @@ global $config;
 require_once './../config-v2.php';
 require_once 'vendor/autoload.php';
 require_once 'TransactionModel.php';
+require_once 'ReturnUrlModel.php';
 require_once 'helper.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
@@ -12,6 +13,8 @@ $current_config = getConfig($config, $config['environment']);
 
 $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 $tableCreated = false;
+$returnUrlTableCreated = false;
+$callbackData = [];
 
 try {
     $bayarcashSdk = new Bayarcash($current_config['bayarcash_bearer_token']);
@@ -20,35 +23,57 @@ try {
     }
 
     $apiSecretKey = $current_config['bayarcash_api_secret_key'];
-    $callbackData = $_POST;
     $validResponse = false;
 
-    // Initialize TransactionModel
+    // Initialize both models
     $transaction = new TransactionModel($config);
-    $tableCreated = $transaction->wasTableCreated();
+    $returnUrlModel = new ReturnUrlModel($config);
 
-    if (isset($callbackData['record_type'])) {
-        switch ($callbackData['record_type']) {
-            case 'pre_transaction':
-                $validResponse = $bayarcashSdk->verifyPreTransactionCallbackData($callbackData, $apiSecretKey);
-                if ($validResponse) {
-                    handlePreTransaction($callbackData, $transaction);
-                    $response = ['status' => 'success', 'message' => 'Pre-transaction processed successfully'];
-                }
-                break;
-            case 'transaction':
-            case 'transaction_receipt':
-                $validResponse = $bayarcashSdk->verifyTransactionCallbackData($callbackData, $apiSecretKey);
-                if ($validResponse) {
-                    handleTransaction($callbackData, $transaction);
-                    $response = ['status' => 'success', 'message' => 'Transaction processed successfully'];
-                }
-                break;
-            default:
-                $response = ['status' => 'error', 'message' => 'Unknown record type'];
+    // Check table creation status
+    $tableCreated = $transaction->wasTableCreated();
+    $returnUrlTableCreated = $returnUrlModel->wasTableCreated();
+
+    // Handle POST requests
+    if (!empty($_POST)) {
+        $callbackData = $_POST;
+
+        if (isset($callbackData['record_type'])) {
+            switch ($callbackData['record_type']) {
+                case 'pre_transaction':
+                    $validResponse = $bayarcashSdk->verifyPreTransactionCallbackData($callbackData, $apiSecretKey);
+                    if ($validResponse) {
+                        handlePreTransaction($callbackData, $transaction);
+                        $response = ['status' => 'success', 'message' => 'Pre-transaction processed successfully'];
+                    }
+                    break;
+                case 'transaction':
+                case 'transaction_receipt':
+                    $validResponse = $bayarcashSdk->verifyTransactionCallbackData($callbackData, $apiSecretKey);
+                    if ($validResponse) {
+                        handleTransaction($callbackData, $transaction);
+                        $response = ['status' => 'success', 'message' => 'Transaction processed successfully'];
+                    }
+                    break;
+                default:
+                    $response = ['status' => 'error', 'message' => 'Unknown record type'];
+            }
+        } else {
+            $response = ['status' => 'error', 'message' => 'Missing record type'];
         }
-    } else {
-        $response = ['status' => 'error', 'message' => 'Missing record type'];
+    }
+    // Handle GET requests (return URL)
+    elseif (!empty($_GET['transaction_id'])) {
+        $callbackData = array_merge([
+            'status_description' => '',
+            'exchange_transaction_id' => '',
+            'status' => ''
+        ], $_GET);
+
+        $validResponse = $bayarcashSdk->verifyReturnUrlCallbackData($callbackData, $apiSecretKey);
+        if ($validResponse) {
+            handleReturnUrlTransaction($callbackData, $returnUrlModel);
+            $response = ['status' => 'success', 'message' => 'Return URL transaction processed successfully'];
+        }
     }
 
     if (!$validResponse) {
@@ -58,13 +83,14 @@ try {
     $response = ['status' => 'error', 'message' => 'EXCEPTION: ' . $e->getMessage()];
 }
 
-function handlePreTransaction($data, $transaction) {
+function handlePreTransaction($data, $transaction): void
+{
     $post_data = [
         'record_type'               => $data['record_type'],
         'transaction_id'            => $data['transaction_id'],
-        'exchange_reference_number' => $data['exchange_reference_number'],
-        'order_number'              => $data['order_number'],
-        'checksum'                  => $data['checksum']
+        'exchange_reference_number' => $data['exchange_reference_number'] ?? '',
+        'order_number'              => $data['order_number'] ?? '',
+        'checksum'                  => $data['checksum'] ?? ''
     ];
 
     if (empty($post_data['transaction_id'])) {
@@ -83,22 +109,23 @@ function handlePreTransaction($data, $transaction) {
     }
 }
 
-function handleTransaction($data, $transaction) {
+function handleTransaction($data, $transaction): void
+{
     $post_data = [
         'record_type'               => $data['record_type'],
         'transaction_id'            => $data['transaction_id'],
-        'exchange_reference_number' => $data['exchange_reference_number'],
-        'exchange_transaction_id'   => $data['exchange_transaction_id'],
-        'order_number'              => $data['order_number'],
-        'currency'                  => $data['currency'],
-        'amount'                    => $data['amount'],
-        'payer_name'                => $data['payer_name'],
-        'payer_email'               => $data['payer_email'],
-        'payer_bank_name'           => $data['payer_bank_name'],
-        'status'                    => $data['status'],
-        'status_description'        => $data['status_description'],
-        'datetime'                  => $data['datetime'],
-        'checksum'                  => $data['checksum']
+        'exchange_reference_number' => $data['exchange_reference_number'] ?? '',
+        'exchange_transaction_id'   => $data['exchange_transaction_id'] ?? '',
+        'order_number'              => $data['order_number'] ?? '',
+        'currency'                  => $data['currency'] ?? '',
+        'amount'                    => $data['amount'] ?? '',
+        'payer_name'                => $data['payer_name'] ?? '',
+        'payer_email'               => $data['payer_email'] ?? '',
+        'payer_bank_name'           => $data['payer_bank_name'] ?? '',
+        'status'                    => $data['status'] ?? '',
+        'status_description'        => $data['status_description'] ?? '',
+        'datetime'                  => $data['datetime'] ?? '',
+        'checksum'                  => $data['checksum'] ?? ''
     ];
 
     try {
@@ -113,6 +140,26 @@ function handleTransaction($data, $transaction) {
     }
 }
 
+function handleReturnUrlTransaction($data, $returnUrlModel): void
+{
+    // Add default values for potentially missing keys
+    $data = array_merge([
+        'status_description' => '',
+        'exchange_transaction_id' => '',
+        'status' => ''
+    ], $data);
+
+    try {
+        $existingTransaction = $returnUrlModel->getByTransactionId($data['transaction_id']);
+        if ($existingTransaction) {
+            $returnUrlModel->update($data);
+        } else {
+            $returnUrlModel->insert($data);
+        }
+    } catch (Exception $e) {
+        log_results('Error handling return URL transaction: ' . $e->getMessage());
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -133,12 +180,12 @@ function handleTransaction($data, $transaction) {
     <div class="mb-3">
         <div>
             <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
-                Reference from GitHub repo &#187;
+                Reference from GitHub repo »
             </a>
         </div>
         <div class="mt-1">
             <a target="_blank" href="https://api.webimpian.support/bayarcash">
-                Bayarcash API documentation &#187;
+                Bayarcash API documentation »
             </a>
         </div>
     </div>
@@ -149,16 +196,20 @@ function handleTransaction($data, $transaction) {
             Payment Callback Response
         </div>
         <div class="card-body">
-
-            <!-- TransactionModel -->
-            <?php if ($tableCreated): ?>
-                <div class="alert-info">
-                    <strong>Info:</strong> Transactions table was created in the database.
+            <!-- Tables Creation Status -->
+            <?php if ($tableCreated || $returnUrlTableCreated): ?>
+                <div class="alert alert-info">
+                    <?php if ($tableCreated): ?>
+                        <div><strong>Info:</strong> Transactions table was created in the database.</div>
+                    <?php endif; ?>
+                    <?php if ($returnUrlTableCreated): ?>
+                        <div><strong>Info:</strong> Return URL transactions table was created in the database.</div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <!-- Status -->
-            <div class="alert <?php echo $response['status'] === 'success' ? 'alert-success' : 'alert-error'; ?>">
+            <div class="alert <?php echo $response['status'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
                 <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
             </div>
 
@@ -186,7 +237,14 @@ function handleTransaction($data, $transaction) {
                     Payment Status
                 </h5>
                 <div class="alert <?php echo $callbackData['status'] === '3' ? 'alert-success' : 'alert-danger'; ?>">
-                    <?php echo get_payment_status_name($callbackData['status']) . ": " . $callbackData['status_description']; ?>
+                    <?php
+                    if (!empty($_GET)) {
+                        $statusName = $returnUrlModel->get_payment_status_name($callbackData['status']);
+                    } else {
+                        $statusName = $transaction->get_payment_status_name($callbackData['status']);
+                    }
+                    echo $statusName . ": " . ($callbackData['status_description'] ?? 'No status description available');
+                    ?>
                 </div>
             <?php endif; ?>
         </div>

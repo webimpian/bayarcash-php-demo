@@ -1,0 +1,6 @@
+{
+    "require": {
+        "webimpian/bayarcash-php-sdk": "^1.2",
+        "ext-pdo": "*"
+    }
+}

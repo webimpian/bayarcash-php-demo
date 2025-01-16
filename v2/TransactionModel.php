@@ -173,6 +173,18 @@ class TransactionModel
         }
     }
 
+
+    public function getAllTransactions(): bool|array
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM transactions ORDER BY created_at DESC");
+            return $stmt->fetchAll();
+        } catch (\PDOException $e) {
+            log_results('Get all transactions failed: ' . $e->getMessage());
+            throw new \PDOException($e->getMessage(), (int) $e->getCode());
+        }
+    }
+
     public function wasTableCreated()
     {
         return $this->tableCreated;

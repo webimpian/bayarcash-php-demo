@@ -1,6 +1,6 @@
 <?php
 global $config;
-require_once '../config-v2.php'; // Ensure this path points to your configuration file
+require_once '../config-v2.php';
 require_once 'vendor/autoload.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
@@ -16,17 +16,25 @@ if ($config['environment'] === 'sandbox') {
 }
 
 // Initialize variables
-$error_message = false;
+$error_message = '';  // Initialize as empty string
 $errors = [];
 
 // Payment gateway options
 $payment_gateways = [
     1 => 'FPX Online Banking (CASA)',
-    4 => "FPX Line of Credit (Credit Card)",
-    5 => "DuitNow Online Banking/Wallets",
+    2 => 'Manual Bank Transfer',
+    3 => 'Direct Debit via FPX',
+    4 => 'FPX Line of Credit (Credit Card)',
+    5 => 'DuitNow Online Banking/Wallets',
+    6 => 'DuitNow QR',
+    7 => 'SPayLater (BNPL from Shopee)',
+    8 => 'Boost PayFlex (BNPL from Boost)',
+    9 => 'QRIS Indonesia Online Banking',
+    10 => 'QRIS Indonesia eWallet',
+    11 => 'NETS Singapore'
 ];
 
-// Sample transaction details (you might want to generate these dynamically)
+// Sample transaction details
 $order_no = str_pad(mt_rand(1, 9999), 6, '0', STR_PAD_RIGHT);
 $order_amount = '1';
 $buyer_name = 'John Doe';
@@ -45,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'payer_name' => $buyer_name,
             'payer_email' => $buyer_email,
             'payer_telephone_number' => $buyer_tel,
+            'callback_url' => $config['return_url'],
             'return_url' => $config['return_url'],
             'payment_channel' => $payment_channel,
             'fpx_buyer_bank_code' => '',
@@ -68,15 +77,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: " . $response->url);
             exit();
         } else {
-            throw new Exception('Payment URL not received');
+            $error_message = 'Payment URL not received';
         }
     } catch (ValidationException $exception) {
+        // Properly handle the validation exception
         $exceptionData = $exception->errors();
-        $error_message = $exceptionData['message'];
-        $errors = $exceptionData['errors'];
+        // Convert array message to string if necessary
+        if (is_array($exceptionData['message'])) {
+            $error_message = implode(' ', $exceptionData['message']);
+        } else {
+            $error_message = (string)$exceptionData['message'];
+        }
+        // Ensure errors is an array of strings
+        $errors = [];
+        if (isset($exceptionData['errors']) && is_array($exceptionData['errors'])) {
+            foreach ($exceptionData['errors'] as $error) {
+                if (is_array($error)) {
+                    $errors[] = implode(' ', $error);
+                } else {
+                    $errors[] = (string)$error;
+                }
+            }
+        }
     } catch (Exception $exception) {
-        $error_message = 'An unexpected error occurred';
-        $errors = [$exception->getMessage()];
+        $error_message = 'An unexpected error occurred: ' . $exception->getMessage();
+        $errors = [];
     }
 }
 

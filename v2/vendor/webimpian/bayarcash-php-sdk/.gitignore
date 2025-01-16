@@ -1,0 +1,8 @@
+/vendor
+src/.DS_Store
+.DS_Store
+.idea/bayarcash-php-sdk.iml
+.idea/modules.xml
+.idea/php.xml
+.idea/vcs.xml
+.idea/workspace.xml
