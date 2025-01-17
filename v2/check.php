@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $transaction = $bayarcash->getTransaction($lookup_value);
         } elseif ($lookup_type === 'order_number' && !empty($lookup_value)) {
             // Use SDK method to get transaction by order number
-            $transaction = $bayarcash->getAllTransactions();
+            $transaction = $bayarcash->getTransactionByOrderNumber($lookup_value);
         }
     } catch (ValidationException $exception) {
         $exceptionData = $exception->errors();
