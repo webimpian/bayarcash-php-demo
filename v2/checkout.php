@@ -1,5 +1,5 @@
 <?php
-global $error_message, $order_no, $order_amount, $order_description, $buyer_name, $buyer_email, $buyer_tel, $payment_gateways;
+global $error_message, $order_no, $order_amount, $order_description, $buyer_name, $buyer_email, $buyer_tel, $payment_gateways, $api_version;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +77,9 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
             <a target="_blank" href="https://api.webimpian.support/bayarcash">
                 Bayarcash API documentation &#187;
             </a>
+        </div>
+        <div class="mt-1">
+            <strong>API Version:</strong> <span id="api-version-display"><?php echo htmlspecialchars($api_version); ?></span>
         </div>
     </div>
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "68675c7224d33f42e186298443a48f8e",
+    "content-hash": "f91c8af75a33669f97ef6d58d3177532",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -568,16 +568,16 @@
         },
         {
             "name": "webimpian/bayarcash-php-sdk",
-            "version": "1.2.5",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webimpian/bayarcash-php-sdk.git",
-                "reference": "525d49b2be96f350b177a52e328e77b06f8e43ea"
+                "reference": "6704175cf157a10b1a536d8fa7e8ff726380e60b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webimpian/bayarcash-php-sdk/zipball/525d49b2be96f350b177a52e328e77b06f8e43ea",
-                "reference": "525d49b2be96f350b177a52e328e77b06f8e43ea",
+                "url": "https://api.github.com/repos/webimpian/bayarcash-php-sdk/zipball/6704175cf157a10b1a536d8fa7e8ff726380e60b",
+                "reference": "6704175cf157a10b1a536d8fa7e8ff726380e60b",
                 "shasum": ""
             },
             "require": {
@@ -618,9 +618,9 @@
             "description": "Bayarcash payment gateway PHP Sdk.",
             "support": {
                 "issues": "https://github.com/webimpian/bayarcash-php-sdk/issues",
-                "source": "https://github.com/webimpian/bayarcash-php-sdk/tree/v1.2.5"
+                "source": "https://github.com/webimpian/bayarcash-php-sdk/tree/v2.0.1"
             },
-            "time": "2024-12-07T13:49:48+00:00"
+            "time": "2025-01-17T13:55:29+00:00"
         }
     ],
     "packages-dev": [],
@@ -629,7 +629,9 @@
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "ext-pdo": "*"
+    },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
