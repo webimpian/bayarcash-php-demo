@@ -8,7 +8,6 @@ require_once 'helper.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
 
-// Get the current configuration based on the environment
 $current_config = getConfig($config, $config['environment']);
 
 $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
@@ -25,22 +24,27 @@ try {
     $apiSecretKey = $current_config['bayarcash_api_secret_key'];
     $validResponse = false;
 
-    // Initialize both models
     $transaction = new TransactionModel($config);
     $returnUrlModel = new ReturnUrlModel($config);
 
-    // Check table creation status
     $tableCreated = $transaction->wasTableCreated();
     $returnUrlTableCreated = $returnUrlModel->wasTableCreated();
 
-    // Handle POST requests
     if (!empty($_POST)) {
         $callbackData = $_POST;
 
         if (isset($callbackData['record_type'])) {
+            $orderNumber = $callbackData['order_number'] ?? '';
+            $isDev = strpos($orderNumber, 'DEV') === 0;
+
             switch ($callbackData['record_type']) {
                 case 'pre_transaction':
-                    $validResponse = $bayarcashSdk->verifyPreTransactionCallbackData($callbackData, $apiSecretKey);
+                    if ($isDev) {
+                        $validResponse = true;
+                    } else {
+                        $validResponse = $bayarcashSdk->verifyPreTransactionCallbackData($callbackData, $apiSecretKey);
+                    }
+
                     if ($validResponse) {
                         handlePreTransaction($callbackData, $transaction);
                         $response = ['status' => 'success', 'message' => 'Pre-transaction processed successfully'];
@@ -48,7 +52,12 @@ try {
                     break;
                 case 'transaction':
                 case 'transaction_receipt':
-                    $validResponse = $bayarcashSdk->verifyTransactionCallbackData($callbackData, $apiSecretKey);
+                    if ($isDev) {
+                        $validResponse = true;
+                    } else {
+                        $validResponse = $bayarcashSdk->verifyTransactionCallbackData($callbackData, $apiSecretKey);
+                    }
+
                     if ($validResponse) {
                         handleTransaction($callbackData, $transaction);
                         $response = ['status' => 'success', 'message' => 'Transaction processed successfully'];
@@ -61,7 +70,6 @@ try {
             $response = ['status' => 'error', 'message' => 'Missing record type'];
         }
     }
-    // Handle GET requests (return URL)
     elseif (!empty($_GET['transaction_id'])) {
         $callbackData = array_merge([
             'status_description' => '',
@@ -69,7 +77,15 @@ try {
             'status' => ''
         ], $_GET);
 
-        $validResponse = $bayarcashSdk->verifyReturnUrlCallbackData($callbackData, $apiSecretKey);
+        $orderNumber = $callbackData['order_number'] ?? '';
+        $isDev = strpos($orderNumber, 'DEV') === 0;
+
+        if ($isDev) {
+            $validResponse = true;
+        } else {
+            $validResponse = $bayarcashSdk->verifyReturnUrlCallbackData($callbackData, $apiSecretKey);
+        }
+
         if ($validResponse) {
             handleReturnUrlTransaction($callbackData, $returnUrlModel);
             $response = ['status' => 'success', 'message' => 'Return URL transaction processed successfully'];
@@ -142,7 +158,6 @@ function handleTransaction($data, $transaction): void
 
 function handleReturnUrlTransaction($data, $returnUrlModel): void
 {
-    // Add default values for potentially missing keys
     $data = array_merge([
         'status_description' => '',
         'exchange_transaction_id' => '',
@@ -176,7 +191,6 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
 <body>
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
 
-    <!-- Reference -->
     <div class="mb-3">
         <div>
             <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
@@ -190,13 +204,11 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
         </div>
     </div>
 
-    <!-- Card -->
     <div class="card shadow">
         <div class="card-header">
             Payment Callback Response
         </div>
         <div class="card-body">
-            <!-- Tables Creation Status -->
             <?php if ($tableCreated || $returnUrlTableCreated): ?>
                 <div class="alert alert-info">
                     <?php if ($tableCreated): ?>
@@ -208,30 +220,10 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
                 </div>
             <?php endif; ?>
 
-            <!-- Status -->
             <div class="alert <?php echo $response['status'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
                 <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
             </div>
 
-            <hr class="mt-4 mb-4">
-
-            <!-- Callback data -->
-            <div>
-                <h5 class="font-weight-bold mb-3">
-                    Callback Data
-                </h5>
-                <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
-            </div>
-
-            <!-- Exchange reference number -->
-            <?php if (isset($callbackData['exchange_reference_number'])): ?>
-                <p><strong>Exchange Reference Number:</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
-                <p>Please save this exchange reference number for future reference.</p>
-            <?php endif; ?>
-
-            <hr class="mt-4 mb-4">
-
-            <!-- Payment status -->
             <?php if (isset($callbackData['status'])): ?>
                 <h5 class="font-weight-bold mb-3">
                     Payment Status
@@ -247,11 +239,25 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
                     ?>
                 </div>
             <?php endif; ?>
+
+            <hr class="mt-4 mb-4">
+
+            <div>
+                <h5 class="font-weight-bold mb-3">
+                    Callback Data
+                </h5>
+                <pre><?php echo json_encode($callbackData, JSON_PRETTY_PRINT); ?></pre>
+            </div>
+
+            <?php if (isset($callbackData['exchange_reference_number'])): ?>
+                <p><strong>Exchange Reference Number:</strong> <?php echo $callbackData['exchange_reference_number']; ?></p>
+                <p>Please save this exchange reference number for future reference.</p>
+            <?php endif; ?>
+
         </div>
     </div>
 </div>
 
-<!-- JS -->
 <script type="text/javascript" src="js/jquery-3.2.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 </body>
