@@ -47,7 +47,7 @@ try {
 
                     if ($validResponse) {
                         handlePreTransaction($callbackData, $transaction);
-                        $response = ['status' => 'success', 'message' => 'Pre-transaction processed successfully'];
+                        $response = ['status' => 'success', 'message' => 'Data received and validated'];
                     }
                     break;
                 case 'transaction':
@@ -60,7 +60,7 @@ try {
 
                     if ($validResponse) {
                         handleTransaction($callbackData, $transaction);
-                        $response = ['status' => 'success', 'message' => 'Transaction processed successfully'];
+                        $response = ['status' => 'success', 'message' => 'Data received and validated'];
                     }
                     break;
                 default:
@@ -88,12 +88,12 @@ try {
 
         if ($validResponse) {
             handleReturnUrlTransaction($callbackData, $returnUrlModel);
-            $response = ['status' => 'success', 'message' => 'Return URL transaction processed successfully'];
+            $response = ['status' => 'success', 'message' => 'Data received and validated'];
         }
     }
 
     if (!$validResponse) {
-        $response = ['status' => 'error', 'message' => 'Invalid response'];
+        $response = ['status' => 'error', 'message' => 'Data validation failed: checksum mismatch'];
     }
 } catch (Exception $e) {
     $response = ['status' => 'error', 'message' => 'EXCEPTION: ' . $e->getMessage()];
@@ -220,8 +220,8 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
                 </div>
             <?php endif; ?>
 
-            <div class="alert <?php echo $response['status'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
-                <?php echo ucfirst($response['status']); ?>. <?php echo $response['message']; ?>
+            <div class="alert alert-info">
+                <strong>System Status:</strong> <?php echo ($response['status'] === 'success') ? 'Data validation successful' : $response['message']; ?>
             </div>
 
             <?php if (isset($callbackData['status'])): ?>
