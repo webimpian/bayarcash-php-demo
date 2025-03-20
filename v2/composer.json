@@ -1,6 +1,8 @@
 {
     "require": {
         "webimpian/bayarcash-php-sdk": "^2.0",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+      "ext-curl": "*",
+      "ext-json": "*"
     }
 }
