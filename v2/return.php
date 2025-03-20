@@ -254,6 +254,23 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
                 <p>Please save this exchange reference number for future reference.</p>
             <?php endif; ?>
 
+            <hr class="mt-4 mb-4">
+
+            <div class="navigation-buttons">
+                <h5 class="font-weight-bold mb-3">Navigation</h5>
+                <div class="d-flex flex-wrap justify-content-between">
+                    <a href="/index.php" class="btn btn-primary mb-2 mr-2">
+                        <i class="fa fa-home"></i> Main Page
+                    </a>
+                    <a href="/dev.php" class="btn btn-info mb-2 mr-2">
+                        <i class="fa fa-code"></i> Dev Testing
+                    </a>
+                    <a href="/expire-payment.php" class="btn btn-warning mb-2">
+                        <i class="fa fa-clock"></i> Expired Payment
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
