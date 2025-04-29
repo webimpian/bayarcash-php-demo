@@ -14,6 +14,8 @@ $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 $tableCreated = false;
 $returnUrlTableCreated = false;
 $callbackData = [];
+$updateMessage = '';
+$updateSuccess = false;
 
 try {
     $bayarcashSdk = new Bayarcash($current_config['bayarcash_bearer_token']);
@@ -30,7 +32,50 @@ try {
     $tableCreated = $transaction->wasTableCreated();
     $returnUrlTableCreated = $returnUrlModel->wasTableCreated();
 
-    if (!empty($_POST)) {
+    // Handle manual transfer status update
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_manual_transfer'])) {
+        try {
+            $refNo = $_POST['ref_no'];
+            $status = $_POST['status'];
+            $amount = $_POST['amount'];
+
+            // Log the update attempt
+            log_results('Updating manual bank transfer status: ' . json_encode([
+                    'ref_no' => $refNo,
+                    'status' => $status,
+                    'amount' => $amount
+                ]));
+
+            // Call the update method
+            $updateResponse = $bayarcashSdk->updateManualBankTransferStatus($refNo, $status, $amount);
+
+            // Log the response
+            log_results('Update response: ' . json_encode($updateResponse));
+
+            // Check if update was successful
+            if (is_array($updateResponse) &&
+                (isset($updateResponse['success']) && $updateResponse['success'] === true) ||
+                (isset($updateResponse['status']) && $updateResponse['status'] === 'success')) {
+
+                $updateSuccess = true;
+                $updateMessage = 'Status successfully updated to: ' . getStatusDescription($status);
+
+                // Update the callback data with new status
+                if (isset($callbackData['transaction_status'])) {
+                    $callbackData['transaction_status'] = $status;
+                    $callbackData['transaction_status_description'] = getStatusDescription($status);
+                }
+            } else {
+                $updateMessage = 'Status update failed. Please check the logs for details.';
+            }
+        } catch (Exception $e) {
+            log_results('Error updating manual bank transfer status: ' . $e->getMessage());
+            $updateMessage = 'Error: ' . $e->getMessage();
+        }
+    }
+
+    // Original callback processing code
+    if (!empty($_POST) && !isset($_POST['update_manual_transfer'])) {
         $callbackData = $_POST;
 
         if (isset($callbackData['record_type'])) {
@@ -70,7 +115,7 @@ try {
             $response = ['status' => 'error', 'message' => 'Missing record type'];
         }
     }
-    elseif (!empty($_GET['transaction_id'])) {
+    elseif (!empty($_GET['transaction_id']) && !isset($_POST['update_manual_transfer'])) {
         $callbackData = array_merge([
             'status_description' => '',
             'exchange_transaction_id' => '',
@@ -92,11 +137,39 @@ try {
         }
     }
 
-    if (!$validResponse) {
+    if (!$validResponse && empty($_POST['update_manual_transfer'])) {
         $response = ['status' => 'error', 'message' => 'Data validation failed: checksum mismatch'];
     }
 } catch (Exception $e) {
     $response = ['status' => 'error', 'message' => 'EXCEPTION: ' . $e->getMessage()];
+}
+
+/**
+ * Get status description based on status code
+ *
+ * @param string $statusCode The status code
+ * @return string Status description
+ */
+function getStatusDescription($statusCode) {
+    $statusMap = [
+        '1' => 'Pending',
+        '2' => 'Failed',
+        '3' => 'Success',
+        '4' => 'Cancelled',
+        '5' => 'Expired'
+    ];
+
+    return $statusMap[$statusCode] ?? 'Unknown';
+}
+
+function getManualTransferStatusOptions() {
+    return [
+        '1' => 'Pending',
+        '2' => 'Failed',
+        '3' => 'Success',
+        '4' => 'Cancelled',
+        '5' => 'Expired'
+    ];
 }
 
 function handlePreTransaction($data, $transaction): void
@@ -224,19 +297,62 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void
                 <strong>System Status:</strong> <?php echo ($response['status'] === 'success') ? 'Data validation successful' : $response['message']; ?>
             </div>
 
-            <?php if (isset($callbackData['status'])): ?>
+            <?php if (!empty($updateMessage)): ?>
+                <div class="alert <?php echo $updateSuccess ? 'alert-success' : 'alert-danger'; ?>">
+                    <strong><?php echo $updateSuccess ? 'Success:' : 'Error:'; ?></strong> <?php echo $updateMessage; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($callbackData['transaction_status']) || isset($callbackData['status'])): ?>
                 <h5 class="font-weight-bold mb-3">
                     Payment Status
                 </h5>
-                <div class="alert <?php echo $callbackData['status'] === '3' ? 'alert-success' : 'alert-danger'; ?>">
+                <div class="alert <?php echo (($callbackData['transaction_status'] ?? $callbackData['status'] ?? '') === '3') ? 'alert-success' : 'alert-danger'; ?>">
                     <?php
+                    $statusCode = $callbackData['transaction_status'] ?? $callbackData['status'] ?? '';
                     if (!empty($_GET)) {
-                        $statusName = $returnUrlModel->get_payment_status_name($callbackData['status']);
+                        $statusName = $returnUrlModel->get_payment_status_name($statusCode);
                     } else {
-                        $statusName = $transaction->get_payment_status_name($callbackData['status']);
+                        $statusName = isset($transaction) ? $transaction->get_payment_status_name($statusCode) : getStatusDescription($statusCode);
                     }
-                    echo $statusName . ": " . ($callbackData['status_description'] ?? 'No status description available');
+                    $statusDescription = $callbackData['transaction_status_description'] ?? $callbackData['status_description'] ?? 'No status description available';
+                    echo $statusName . ": " . $statusDescription;
                     ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($callbackData['transaction_channel']) && $callbackData['transaction_channel'] === 'ManualBankTransfer' && isset($callbackData['order_ref_no'])): ?>
+                <hr class="mt-4 mb-4">
+
+                <div class="manual-transfer-update">
+                    <h5 class="font-weight-bold mb-3">
+                        Update Manual Transfer Status
+                    </h5>
+
+                    <form method="post" action="">
+                        <input type="hidden" name="update_manual_transfer" value="1">
+                        <input type="hidden" name="ref_no" value="<?php echo htmlspecialchars($callbackData['order_ref_no']); ?>">
+                        <input type="hidden" name="amount" value="<?php echo htmlspecialchars($callbackData['order_amount']); ?>">
+
+                        <div class="form-group">
+                            <label for="status">New Status:</label>
+                            <select class="form-control" id="status" name="status">
+                                <?php
+                                $statuses = getManualTransferStatusOptions();
+                                foreach ($statuses as $code => $description):
+                                    $selected = ($callbackData['transaction_status'] == $code) ? 'selected' : '';
+                                    ?>
+                                    <option value="<?php echo $code; ?>" <?php echo $selected; ?>>
+                                        <?php echo $description; ?> (<?php echo $code; ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-sync"></i> Update Status
+                        </button>
+                    </form>
                 </div>
             <?php endif; ?>
 
