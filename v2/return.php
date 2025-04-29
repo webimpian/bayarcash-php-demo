@@ -152,7 +152,7 @@ try {
  */
 function getStatusDescription($statusCode) {
     $statusMap = [
-        '1' => 'Pending',
+        //'1' => 'Pending',
         '2' => 'Failed',
         //'3' => 'Success',
         '4' => 'Cancelled',
@@ -164,7 +164,7 @@ function getStatusDescription($statusCode) {
 
 function getManualTransferStatusOptions() {
     return [
-        '1' => 'Pending',
+        //'1' => 'Pending',
         '2' => 'Failed',
         //'3' => 'Success',
         '4' => 'Cancelled',
