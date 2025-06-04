@@ -13,11 +13,11 @@ $error_message = '';
 $errors = [];
 
 $payment_gateways = [
-//    1 => 'FPX Online Banking (CASA)',
+    1 => 'FPX Online Banking (CASA)',
 //    2 => 'Manual Bank Transfer',
 //    3 => 'Direct Debit via FPX',
-//    4 => 'FPX Line of Credit (Credit Card)',
-//    5 => 'DuitNow Online Banking/Wallets',
+    4 => 'FPX Line of Credit (Credit Card)',
+    5 => 'DuitNow Online Banking/Wallets',
     6 => 'DuitNow QR',
 //    7 => 'SPayLater (BNPL from Shopee)',
 //    8 => 'Boost PayFlex (BNPL from Boost)',
