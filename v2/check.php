@@ -1,8 +1,7 @@
 <?php
 //error_reporting(E_ALL & ~E_DEPRECATED);
 
-global $config;
-require_once '../config-v2.php';
+$config = require_once '../config-v2.php';
 require_once 'vendor/autoload.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;

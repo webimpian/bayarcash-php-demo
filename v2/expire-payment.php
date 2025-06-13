@@ -1,6 +1,5 @@
 <?php
-global $config;
-require_once '../config-v2.php';
+$config = require_once '../config-v2.php';
 require_once 'vendor/autoload.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;

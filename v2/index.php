@@ -1,6 +1,5 @@
 <?php
-global $config;
-require_once '../config-v2.php';
+$config = require_once '../config-v2.php';
 require_once 'vendor/autoload.php';
 
 use Webimpian\BayarcashSdk\Bayarcash;
@@ -26,11 +25,11 @@ $errors = [];
 $payment_gateways = [
     1 => 'FPX Online Banking (CASA)',
     2 => 'Manual Bank Transfer',
-    3 => 'Direct Debit via FPX',
+    //3 => 'Direct Debit via FPX',
     4 => 'FPX Line of Credit (Credit Card)',
     5 => 'DuitNow Online Banking/Wallets',
     6 => 'DuitNow QR',
-    7 => 'SPayLater (BNPL from Shopee)',
+    //7 => 'SPayLater (BNPL from Shopee)',
     8 => 'Boost PayFlex (BNPL from Boost)',
     9 => 'QRIS Indonesia Online Banking',
     10 => 'QRIS Indonesia eWallet',
