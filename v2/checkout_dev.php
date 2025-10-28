@@ -244,13 +244,25 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     <!-- Alert -->
     <?php if ($error_message): ?>
         <div class="alert alert-danger" role="alert">
-            <?php echo htmlspecialchars($error_message); ?>
-            <?php if (!empty($errors)): ?>
-                <ul>
+            <strong>Error:</strong> <?php echo htmlspecialchars($error_message); ?>
+            <?php if (!empty($errors) && count($errors) > 1): ?>
+                <hr class="my-2">
+                <strong>Details:</strong>
+                <ul class="mb-0 mt-2">
                     <?php foreach ($errors as $error): ?>
                         <li><?php echo htmlspecialchars($error); ?></li>
                     <?php endforeach; ?>
                 </ul>
+            <?php elseif (!empty($errors) && count($errors) === 1): ?>
+                <?php
+                    // Only show detail if it's different from main message
+                    $detail = htmlspecialchars($errors[0]);
+                    $main = htmlspecialchars($error_message);
+                    if (stripos($main, $detail) === false && stripos($detail, $main) === false):
+                ?>
+                    <hr class="my-2">
+                    <small><?php echo $detail; ?></small>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     <?php endif; ?>

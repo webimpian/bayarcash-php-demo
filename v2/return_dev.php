@@ -2,14 +2,14 @@
 session_start();
 
 $config = require_once '../config-v2.php';
-require_once 'vendor/autoload.php';
 require_once 'TransactionModel.php';
 require_once 'ReturnUrlModel.php';
 require_once 'helper.php';
 
-use Webimpian\BayarcashSdk\Bayarcash;
-
+$config['environment'] = 'dev';
 $current_config = getConfig($config, $config['environment']);
+
+$manual_transfer_status_endpoint = 'https://console.bayarcash.dev/api/manual-bank-transfer/update-status';
 
 $response = ['status' => 'error', 'message' => 'Unknown error occurred'];
 $tableCreated = false;
@@ -20,15 +20,6 @@ $updateMessage = '';
 $updateSuccess = false;
 
 try {
-    $bayarcash = new Bayarcash($current_config['bayarcash_bearer_token']);
-
-    if ($config['environment'] === 'sandbox') {
-        $bayarcash->useSandbox();
-    }
-
-    $apiSecretKey = $current_config['bayarcash_api_secret_key'];
-    $validResponse = false;
-
     $transaction = new TransactionModel($config);
     $returnUrlModel = new ReturnUrlModel($config);
 
@@ -45,25 +36,22 @@ try {
                 $callbackData = $_SESSION['callback_data'];
             }
 
-            log_results('Manual Transfer Status Update (SDK): ' . json_encode([
+            log_results('Manual Transfer Status Update (Dev): ' . json_encode([
                 'ref_no' => $refNo,
                 'status' => $status,
                 'amount' => $amount
             ]));
 
-            $updateResponse = $bayarcash->updateManualBankTransferStatus($refNo, $status, $amount);
+            $updateResponse = updateManualTransferStatus($refNo, $status, $amount, $current_config['bayarcash_bearer_token'], $manual_transfer_status_endpoint);
 
-            log_results('SDK Update Response: ' . json_encode($updateResponse));
+            log_results('Update Response: ' . json_encode($updateResponse));
 
-            if (is_array($updateResponse) &&
-                (isset($updateResponse['success']) && $updateResponse['success'] === true) ||
-                (isset($updateResponse['status']) && $updateResponse['status'] === 'success')) {
-
+            if ($updateResponse['success']) {
                 $updateSuccess = true;
                 $updateMessage = 'Status successfully updated to: ' . getStatusDescription($status);
                 $response = ['status' => 'success', 'message' => 'Status updated successfully'];
 
-                $transaction = $updateResponse['transaction'] ?? [];
+                $transaction = $updateResponse['response']['transaction'] ?? [];
                 $displayData = [
                     'success' => true,
                     'ref_no' => $refNo,
@@ -91,7 +79,7 @@ try {
                     'transaction_channel' => 'ManualBankTransfer'
                 ]);
             } else {
-                $updateMessage = 'Status update failed. Please check the logs for details.';
+                $updateMessage = 'Status update failed: ' . ($updateResponse['error'] ?? 'Unknown error');
                 $displayData = $updateResponse;
             }
         } catch (Exception $e) {
@@ -106,32 +94,18 @@ try {
         $_SESSION['callback_data'] = $callbackData;
 
         if (isset($callbackData['transaction_channel']) && $callbackData['transaction_channel'] === 'ManualBankTransfer') {
-            $validResponse = true;
             $response = ['status' => 'success', 'message' => 'Manual bank transfer data received'];
         } elseif (isset($callbackData['record_type'])) {
-            $orderNumber = $callbackData['order_number'] ?? '';
-            $isDev = strpos($orderNumber, 'DEV') === 0;
-
             switch ($callbackData['record_type']) {
                 case 'pre_transaction':
-                    $validResponse = $isDev ? true : $bayarcash->verifyPreTransactionCallbackData($callbackData, $apiSecretKey);
-
-                    if ($validResponse) {
-                        handlePreTransaction($callbackData, $transaction);
-                        $response = ['status' => 'success', 'message' => 'Pre-transaction data received and validated'];
-                    }
+                    handlePreTransaction($callbackData, $transaction);
+                    $response = ['status' => 'success', 'message' => 'Pre-transaction data received'];
                     break;
-
                 case 'transaction':
                 case 'transaction_receipt':
-                    $validResponse = $isDev ? true : $bayarcash->verifyTransactionCallbackData($callbackData, $apiSecretKey);
-
-                    if ($validResponse) {
-                        handleTransaction($callbackData, $transaction);
-                        $response = ['status' => 'success', 'message' => 'Transaction data received and validated'];
-                    }
+                    handleTransaction($callbackData, $transaction);
+                    $response = ['status' => 'success', 'message' => 'Transaction data received'];
                     break;
-
                 default:
                     $response = ['status' => 'error', 'message' => 'Unknown record type'];
             }
@@ -147,28 +121,54 @@ try {
         $displayData = $callbackData;
         $_SESSION['callback_data'] = $callbackData;
 
-        $orderNumber = $callbackData['order_number'] ?? '';
-        $isDev = strpos($orderNumber, 'DEV') === 0;
-
-        $validResponse = $isDev ? true : $bayarcash->verifyReturnUrlCallbackData($callbackData, $apiSecretKey);
-
-        if ($validResponse) {
-            handleReturnUrlTransaction($callbackData, $returnUrlModel);
-            $response = ['status' => 'success', 'message' => 'Return URL data received and validated'];
-        }
+        handleReturnUrlTransaction($callbackData, $returnUrlModel);
+        $response = ['status' => 'success', 'message' => 'Return URL data received'];
     } elseif (!empty($_GET) && isset($_GET['transaction_channel']) && !isset($_POST['update_manual_transfer'])) {
         $callbackData = $_GET;
         $displayData = $_GET;
         $_SESSION['callback_data'] = $callbackData;
-        $validResponse = true;
         $response = ['status' => 'success', 'message' => 'Manual bank transfer data received'];
-    }
-
-    if (!$validResponse && empty($_POST['update_manual_transfer'])) {
-        $response = ['status' => 'error', 'message' => 'Data validation failed: checksum mismatch'];
     }
 } catch (Exception $e) {
     $response = ['status' => 'error', 'message' => 'EXCEPTION: ' . $e->getMessage()];
+}
+
+function updateManualTransferStatus($ref_no, $status, $amount, $bearer_token, $endpoint) {
+    $data = [
+        'ref_no' => $ref_no,
+        'status' => $status,
+        'amount' => $amount
+    ];
+
+    $ch = curl_init($endpoint);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json',
+        'Authorization: Bearer ' . $bearer_token,
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
+
+    log_results('Manual Transfer Status Update API Response: ' . $response);
+
+    if (!empty($curl_error)) {
+        return ['success' => false, 'error' => $curl_error];
+    }
+
+    $decoded = json_decode($response, true);
+
+    if ($http_code >= 200 && $http_code < 300) {
+        return ['success' => true, 'response' => $decoded];
+    }
+
+    return ['success' => false, 'response' => $decoded, 'http_code' => $http_code];
 }
 
 function getStatusDescription($statusCode) {
@@ -271,7 +271,7 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bayarcash Payment Callback Response</title>
+    <title>Bayarcash Dev - Payment Response</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/desktop.css">
@@ -281,6 +281,9 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
 
     <div class="mb-3">
+        <div class="alert alert-info">
+            <i class="fa fa-info-circle"></i> <strong>Dev Environment</strong> - Direct API calls (no SDK)
+        </div>
         <div>
             <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
                 Reference from GitHub repo »
@@ -295,7 +298,7 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
 
     <div class="card shadow">
         <div class="card-header">
-            Payment Callback Response
+            <i class="fa fa-code"></i> Payment Response (Dev)
         </div>
         <div class="card-body">
             <?php if ($tableCreated || $returnUrlTableCreated): ?>
@@ -314,8 +317,8 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
                     <strong><?php echo $updateSuccess ? 'Success:' : 'Error:'; ?></strong> <?php echo $updateMessage; ?>
                 </div>
             <?php else: ?>
-                <div class="alert alert-info">
-                    <strong>System Status:</strong> <?php echo ($response['status'] === 'success') ? 'Data validation successful' : $response['message']; ?>
+                <div class="alert alert-<?php echo ($response['status'] === 'success') ? 'success' : 'danger'; ?>">
+                    <strong>System Status:</strong> <?php echo ($response['status'] === 'success') ? 'Data received successfully' : $response['message']; ?>
                 </div>
             <?php endif; ?>
 
@@ -338,6 +341,7 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
                 <div class="manual-transfer-update">
                     <h5 class="font-weight-bold mb-3">
                         Update Manual Transfer Status
+                        <span class="badge badge-info ml-2">Direct API</span>
                     </h5>
 
                     <form method="post" action="">
@@ -387,7 +391,7 @@ function handleReturnUrlTransaction($data, $returnUrlModel): void {
                 <h5 class="font-weight-bold mb-3">Navigation</h5>
                 <div class="d-flex flex-wrap justify-content-between">
                     <a href="<?php echo $config['base_url']; ?>index.php" class="btn btn-primary mb-2 mr-2">
-                        <i class="fa fa-home"></i> Main Page
+                        <i class="fa fa-home"></i> Main Page (SDK)
                     </a>
                     <a href="<?php echo $config['base_url']; ?>dev.php" class="btn btn-info mb-2 mr-2">
                         <i class="fa fa-code"></i> Dev Testing
