@@ -138,7 +138,7 @@ function generateDefaultOrderData(): array {
 
     return [
         'order_no' => 'DEV' . str_pad(mt_rand(1, 9999), 6, '0', STR_PAD_RIGHT),
-        'order_amount' => '1.00',
+        'order_amount' => '10.00',
         'buyer_name' => $buyer_name,
         'buyer_email' => generateRandomEmail($buyer_name),
         'buyer_tel' => '0196788044',
