@@ -361,6 +361,100 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
         .emandate-buttons.hidden {
             display: none;
         }
+        /* Payment Channel Tabs */
+        .channel-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .channel-tab {
+            padding: 8px 14px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .channel-tab:hover {
+            background: #e0e0e0;
+        }
+        .channel-tab.active {
+            background: #5a67d8;
+            color: white;
+        }
+        .channel-tab-content {
+            display: none;
+        }
+        .channel-tab-content.active {
+            display: block;
+        }
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .channel-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+        .channel-btn:hover {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+        .channel-btn:active {
+            transform: scale(0.98);
+        }
+        .channel-btn .channel-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .channel-btn .channel-icon.banking { background: #e3f2fd; color: #1976d2; }
+        .channel-btn .channel-icon.card { background: #fce4ec; color: #c2185b; }
+        .channel-btn .channel-icon.ewallet { background: #e8f5e9; color: #388e3c; }
+        .channel-btn .channel-icon.bnpl { background: #fff3e0; color: #f57c00; }
+        .channel-btn .channel-icon.intl { background: #e0f7fa; color: #0097a7; }
+        .channel-btn .channel-icon.other { background: #f5f5f5; color: #616161; }
+        .channel-btn .channel-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .channel-btn .channel-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #333;
+        }
+        .channel-btn .channel-desc {
+            font-size: 0.7rem;
+            color: #888;
+        }
+        @media (max-width: 576px) {
+            .channel-grid {
+                grid-template-columns: 1fr;
+            }
+            .channel-tab {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -377,7 +471,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     <div class="config-panel">
         <div class="config-panel-header">
             <h6 class="config-panel-title">
-                <i class="fas fa-sliders-h"></i> API Configuration
+                <i class="fas fa-sliders-h"></i> API Configuration <span id="config-mode-label">(Default)</span>
             </h6>
             <button type="button" class="config-panel-btn" id="config-button">
                 <i class="fas fa-edit"></i> Override
@@ -455,10 +549,6 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                                 </div>
                             </div>
                             <div class="form-group mb-3">
-                                <label class="mb-1" for="order_description"><b>Description</b></label>
-                                <input type="text" name="order_description" id="order_description" class="form-control" value="<?php echo htmlspecialchars($order_description); ?>">
-                            </div>
-                            <div class="form-group mb-3">
                                 <label class="mb-1" for="buyer_name"><b>Name</b></label>
                                 <input type="text" name="buyer_name" id="buyer_name" class="form-control" value="<?php echo htmlspecialchars($buyer_name); ?>">
                             </div>
@@ -523,15 +613,197 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 
                 <!-- Payment Gateway Buttons -->
                 <div class="payment-buttons" id="payment-buttons">
-                    <div class="row mt-4">
-                        <?php foreach($payment_gateways as $id => $label) : ?>
-                            <div class="col-12 button mb-2">
-                                <button type="button" class="btn btn-success btn-block mr-1 h-100 p-2 payment-gateway-btn" data-gateway="<?php echo $id; ?>">
-                                    <?php echo htmlspecialchars($label); ?>
-                                    <i class="fa-duotone fa-solid fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
+                    <!-- Tabs -->
+                    <div class="channel-tabs">
+                        <button type="button" class="channel-tab active" data-tab="banking">Banking</button>
+                        <button type="button" class="channel-tab" data-tab="cards">Cards</button>
+                        <button type="button" class="channel-tab" data-tab="ewallet">eWallet</button>
+                        <button type="button" class="channel-tab" data-tab="bnpl">BNPL</button>
+                        <button type="button" class="channel-tab" data-tab="intl">International</button>
+                        <button type="button" class="channel-tab" data-tab="other">Other</button>
+                    </div>
+
+                    <!-- Banking -->
+                    <div class="channel-tab-content active" id="tab-banking">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="1">
+                                <div class="channel-icon banking"><i class="fas fa-university"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">FPX Online Banking</div>
+                                    <div class="channel-desc">CASA Account</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="4">
+                                <div class="channel-icon banking"><i class="fas fa-credit-card"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">FPX Line of Credit</div>
+                                    <div class="channel-desc">Credit Card via FPX</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="5">
+                                <div class="channel-icon banking"><i class="fas fa-mobile-alt"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">DuitNow</div>
+                                    <div class="channel-desc">Online Banking/Wallets</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="6">
+                                <div class="channel-icon banking"><i class="fas fa-qrcode"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">DuitNow QR</div>
+                                    <div class="channel-desc">Scan & Pay</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cards -->
+                    <div class="channel-tab-content" id="tab-cards">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="12">
+                                <div class="channel-icon card"><i class="fas fa-credit-card"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Credit Card</div>
+                                    <div class="channel-desc">Visa / Mastercard</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="22">
+                                <div class="channel-icon card"><i class="fab fa-cc-jcb"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">JCB</div>
+                                    <div class="channel-desc">JCB Card</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- eWallet -->
+                    <div class="channel-tab-content" id="tab-ewallet">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="16">
+                                <div class="channel-icon ewallet"><i class="fas fa-wallet"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Touch n Go</div>
+                                    <div class="channel-desc">TnG eWallet</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="17">
+                                <div class="channel-icon ewallet"><i class="fas fa-wallet"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Boost</div>
+                                    <div class="channel-desc">Boost Wallet</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="18">
+                                <div class="channel-icon ewallet"><i class="fas fa-wallet"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">GrabPay</div>
+                                    <div class="channel-desc">Grab Wallet</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="21">
+                                <div class="channel-icon ewallet"><i class="fas fa-wallet"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Shopee Pay</div>
+                                    <div class="channel-desc">Shopee Wallet</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BNPL -->
+                    <div class="channel-tab-content" id="tab-bnpl">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="7">
+                                <div class="channel-icon bnpl"><i class="fas fa-clock"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">SPayLater</div>
+                                    <div class="channel-desc">Shopee BNPL</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="8">
+                                <div class="channel-icon bnpl"><i class="fas fa-clock"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Boost PayFlex</div>
+                                    <div class="channel-desc">Boost BNPL</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="19">
+                                <div class="channel-icon bnpl"><i class="fas fa-clock"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">GrabPay Later</div>
+                                    <div class="channel-desc">Grab BNPL</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="20">
+                                <div class="channel-icon bnpl"><i class="fas fa-clock"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">ShopBack</div>
+                                    <div class="channel-desc">ShopBack BNPL</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- International -->
+                    <div class="channel-tab-content" id="tab-intl">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="9">
+                                <div class="channel-icon intl"><i class="fas fa-globe-asia"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">QRIS Banking</div>
+                                    <div class="channel-desc">Indonesia</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="10">
+                                <div class="channel-icon intl"><i class="fas fa-globe-asia"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">QRIS eWallet</div>
+                                    <div class="channel-desc">Indonesia</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="11">
+                                <div class="channel-icon intl"><i class="fas fa-globe-asia"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">NETS</div>
+                                    <div class="channel-desc">Singapore</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="13">
+                                <div class="channel-icon intl"><i class="fab fa-alipay"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Alipay</div>
+                                    <div class="channel-desc">China</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="14">
+                                <div class="channel-icon intl"><i class="fab fa-weixin"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">WeChat Pay</div>
+                                    <div class="channel-desc">China</div>
+                                </div>
+                            </button>
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="15">
+                                <div class="channel-icon intl"><i class="fas fa-globe-asia"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">PromptPay</div>
+                                    <div class="channel-desc">Thailand</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Other -->
+                    <div class="channel-tab-content" id="tab-other">
+                        <div class="channel-grid">
+                            <button type="button" class="channel-btn payment-gateway-btn" data-gateway="2">
+                                <div class="channel-icon other"><i class="fas fa-file-invoice"></i></div>
+                                <div class="channel-info">
+                                    <div class="channel-name">Manual Bank Transfer</div>
+                                    <div class="channel-desc">Upload proof of payment</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -589,7 +861,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                     </div>
 
                     <div class="current-config-box">
-                        <h6><i class="fas fa-plug"></i> Current Connection (Default)</h6>
+                        <h6><i class="fas fa-plug"></i> Current Connection <span id="connection-mode-label">(Default)</span></h6>
                         <div id="modal-merchant-info">
                             <span class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</span>
                         </div>
@@ -616,28 +888,18 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 <script>
     function updateConfigStatus() {
-        const bearerStatus = document.getElementById('bearer-status');
-        const portalStatus = document.getElementById('portal-status');
-
-        if (!bearerStatus || !portalStatus) return;
-
         const bearerOverride = localStorage.getItem('bayarcash_bearer_token_override');
         const portalOverride = localStorage.getItem('bayarcash_portal_key_override');
+        const hasOverride = (bearerOverride && bearerOverride.trim() !== '') || (portalOverride && portalOverride.trim() !== '');
 
-        if (bearerOverride && bearerOverride.trim() !== '') {
-            bearerStatus.classList.add('active');
-            bearerStatus.querySelector('.status-text').textContent = 'Browser Override';
-        } else {
-            bearerStatus.classList.remove('active');
-            bearerStatus.querySelector('.status-text').textContent = 'Config Default';
+        const configModeLabel = document.getElementById('config-mode-label');
+        if (configModeLabel) {
+            configModeLabel.textContent = hasOverride ? '(Override)' : '(Default)';
         }
 
-        if (portalOverride && portalOverride.trim() !== '') {
-            portalStatus.classList.add('active');
-            portalStatus.querySelector('.status-text').textContent = 'Browser Override';
-        } else {
-            portalStatus.classList.remove('active');
-            portalStatus.querySelector('.status-text').textContent = 'Config Default';
+        const connectionModeLabel = document.getElementById('connection-mode-label');
+        if (connectionModeLabel) {
+            connectionModeLabel.textContent = hasOverride ? '(Override)' : '(Default)';
         }
     }
 
@@ -834,6 +1096,24 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
             btn.addEventListener('click', function() {
                 const gateway = this.getAttribute('data-gateway');
                 submitForm(gateway);
+            });
+        });
+
+        // Channel tabs
+        const channelTabs = document.querySelectorAll('.channel-tab');
+        channelTabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Update active tab
+                channelTabs.forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+
+                // Show corresponding content
+                document.querySelectorAll('.channel-tab-content').forEach(function(content) {
+                    content.classList.remove('active');
+                });
+                document.getElementById('tab-' + tabName).classList.add('active');
             });
         });
 
