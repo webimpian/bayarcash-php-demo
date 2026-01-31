@@ -455,6 +455,137 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                 font-size: 0.75rem;
             }
         }
+        /* Split Payment Styles */
+        .split-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .split-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .split-header label {
+            margin: 0;
+            font-weight: 600;
+        }
+        .split-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        .split-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .split-toggle .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .split-toggle .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .split-toggle input:checked + .slider {
+            background-color: #5a67d8;
+        }
+        .split-toggle input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .split-container {
+            display: none;
+        }
+        .split-container.active {
+            display: block;
+        }
+        .split-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .split-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .split-item-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .split-remove-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+        .split-remove-btn:hover {
+            color: #c53030;
+        }
+        .split-row {
+            display: grid;
+            grid-template-columns: 1fr 100px 80px;
+            gap: 8px;
+        }
+        .split-row input, .split-row select {
+            font-size: 0.85rem;
+            padding: 6px 10px;
+        }
+        .split-add-btn {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ccc;
+            background: transparent;
+            border-radius: 8px;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .split-add-btn:hover {
+            border-color: #5a67d8;
+            color: #5a67d8;
+        }
+        .split-add-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .split-error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 576px) {
+            .split-row {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -562,6 +693,25 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Split Payment Section -->
+                <div class="split-section" id="split-section">
+                    <div class="split-header">
+                        <label><i class="fas fa-code-branch"></i> Split Payment</label>
+                        <label class="split-toggle">
+                            <input type="checkbox" id="split-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mb-2">Split payment to multiple recipients (max 6)</small>
+                    <div class="split-container" id="split-container">
+                        <div id="split-items"></div>
+                        <button type="button" class="split-add-btn" id="split-add-btn">
+                            <i class="fas fa-plus"></i> Add Recipient
+                        </button>
+                    </div>
+                    <input type="hidden" name="splits" id="splits" value="<?php echo htmlspecialchars($_POST['splits'] ?? ''); ?>">
                 </div>
 
                 <!-- eMandate Specific Fields -->
@@ -953,11 +1103,107 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
     }
 
     function submitForm(paymentMethod) {
+        // Clear previous split errors
+        clearSplitErrors();
+
+        // Validate splits if enabled
+        const splitToggle = document.getElementById('split-toggle');
+        if (splitToggle && splitToggle.checked) {
+            const items = document.querySelectorAll('#split-items .split-item');
+            if (items.length === 0) {
+                showSplitError('Please add at least one split recipient.');
+                return;
+            }
+
+            const totalAmount = parseFloat(document.getElementById('order_amount').value) || 0;
+            let totalFixed = 0;
+            let totalPercentage = 0;
+            let hasValidSplit = false;
+            let hasError = false;
+
+            items.forEach(function(item) {
+                const email = item.querySelector('.split-email');
+                const type = item.querySelector('.split-type').value;
+                const valueField = item.querySelector('.split-value');
+                const value = parseFloat(valueField.value) || 0;
+
+                // Reset styles
+                email.style.borderColor = '';
+                valueField.style.borderColor = '';
+
+                if (!email.value.trim()) {
+                    email.style.borderColor = '#e53e3e';
+                    hasError = true;
+                }
+                if (!valueField.value || value <= 0) {
+                    valueField.style.borderColor = '#e53e3e';
+                    hasError = true;
+                }
+                if (email.value.trim() && value > 0) {
+                    hasValidSplit = true;
+                    if (type === 'fixed') {
+                        totalFixed += value;
+                    } else {
+                        totalPercentage += value;
+                    }
+                }
+            });
+
+            if (hasError) {
+                showSplitError('Please fill in all split recipient details.');
+                return;
+            }
+
+            if (!hasValidSplit) {
+                showSplitError('Please add at least one valid split recipient.');
+                return;
+            }
+
+            // Validate total fixed amount
+            if (totalFixed > totalAmount) {
+                showSplitError('Total fixed split amount (RM ' + totalFixed.toFixed(2) + ') exceeds order amount (RM ' + totalAmount.toFixed(2) + ').');
+                return;
+            }
+
+            // Validate total percentage
+            if (totalPercentage > 100) {
+                showSplitError('Total percentage split (' + totalPercentage + '%) exceeds 100%.');
+                return;
+            }
+
+            // Validate combined (fixed + percentage of remaining)
+            const remainingAfterFixed = totalAmount - totalFixed;
+            const percentageAmount = (totalPercentage / 100) * totalAmount;
+            if (totalFixed + percentageAmount > totalAmount) {
+                showSplitError('Combined split amounts exceed order total.');
+                return;
+            }
+        }
+
         document.getElementById('payment_method').value = paymentMethod;
         setHiddenFormFields();
+        updateSplitsData();
         document.getElementById('loading-overlay').style.display = 'block';
         localStorage.setItem('formSubmitTime', Date.now());
         document.getElementById('payment-form').submit();
+    }
+
+    function showSplitError(message) {
+        const container = document.getElementById('split-container');
+        if (!container) return;
+
+        clearSplitErrors();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'split-error';
+        errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+        container.insertBefore(errorDiv, container.firstChild);
+    }
+
+    function clearSplitErrors() {
+        const errors = document.querySelectorAll('.split-error');
+        errors.forEach(function(el) { el.remove(); });
+        const fields = document.querySelectorAll('.split-email, .split-value');
+        fields.forEach(function(el) { el.style.borderColor = ''; });
     }
 
     function generateRandomMyKad() {
@@ -1116,6 +1362,229 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                 document.getElementById('tab-' + tabName).classList.add('active');
             });
         });
+
+        // Split Payment
+        const splitToggle = document.getElementById('split-toggle');
+        const splitContainer = document.getElementById('split-container');
+        const splitItems = document.getElementById('split-items');
+        const splitAddBtn = document.getElementById('split-add-btn');
+        const splitsData = document.getElementById('splits');
+        let splitCount = 0;
+        const maxSplits = 6;
+
+        if (splitToggle) {
+            splitToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    splitContainer.classList.add('active');
+                    if (splitCount === 0) addSplitItem();
+                } else {
+                    splitContainer.classList.remove('active');
+                }
+                updateSplitsData();
+            });
+        }
+
+        if (splitAddBtn) {
+            splitAddBtn.addEventListener('click', function() {
+                if (splitCount < maxSplits) {
+                    addSplitItem();
+                }
+            });
+        }
+
+        // Restore splits from hidden field (after form error)
+        function restoreSplits() {
+            const splitsField = document.getElementById('splits');
+            if (!splitsField || !splitsField.value) return;
+
+            try {
+                const splits = JSON.parse(splitsField.value);
+                if (Array.isArray(splits) && splits.length > 0) {
+                    // Enable toggle
+                    if (splitToggle) {
+                        splitToggle.checked = true;
+                        splitContainer.classList.add('active');
+                    }
+
+                    // Add each split item
+                    splits.forEach(function(split) {
+                        if (splitCount >= maxSplits) return;
+                        splitCount++;
+
+                        const item = document.createElement('div');
+                        item.className = 'split-item';
+                        item.setAttribute('data-split-id', splitCount);
+                        item.innerHTML =
+                            '<div class="split-item-header">' +
+                                '<span class="split-item-title">Recipient #' + splitCount + '</span>' +
+                                '<button type="button" class="split-remove-btn" onclick="removeSplitItem(this)"><i class="fas fa-times"></i></button>' +
+                            '</div>' +
+                            '<div class="split-row">' +
+                                '<input type="email" class="form-control split-email" value="' + (split.recipient_email || '') + '" onchange="updateSplitsData()">' +
+                                '<select class="form-control split-type" onchange="updateSplitsData()">' +
+                                    '<option value="fixed"' + (split.type === 'fixed' ? ' selected' : '') + '>RM</option>' +
+                                    '<option value="percentage"' + (split.type === 'percentage' ? ' selected' : '') + '>%</option>' +
+                                '</select>' +
+                                '<input type="number" class="form-control split-value" value="' + (split.value || 10) + '" min="0" step="0.01" onchange="updateSplitsData()">' +
+                            '</div>';
+
+                        splitItems.appendChild(item);
+                    });
+
+                    updateAddButton();
+                }
+            } catch (e) {
+                console.error('Error restoring splits:', e);
+            }
+        }
+
+        restoreSplits();
+
+        const splitEmails = [
+            'notification@aplikasiniaga.com', 'aina@webimpian.com', 'ramzyabc@webimpian.com',
+            'alwancs110@gmail.com', 'account@webimpian.com', 'hi.tweetislamik@gmail.com',
+            'masjidpadangbongor@gmail.com', 'berimakan@dailymakan.com', 'herblissmsdnbhd@gmail.com',
+            'notification@bayar.cash', 'exothickdusun@gmail.com', 'nuranisnadhirah1998@gmail.com',
+            'nadia@webimpian.com', 'test@gmail.com', 'ramzy-debug-x@webimpian.com'
+        ];
+
+        function getUsedEmails() {
+            const used = [];
+            document.querySelectorAll('#split-items .split-email').forEach(function(el) {
+                if (el.value) used.push(el.value);
+            });
+            return used;
+        }
+
+        function getRandomEmail() {
+            const used = getUsedEmails();
+            const available = splitEmails.filter(function(email) {
+                return used.indexOf(email) === -1;
+            });
+            if (available.length === 0) return splitEmails[Math.floor(Math.random() * splitEmails.length)];
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function getRandomType() {
+            return Math.random() > 0.5 ? 'fixed' : 'percentage';
+        }
+
+        function getUsedSplitTotals() {
+            let totalFixed = 0;
+            let totalPercentage = 0;
+            document.querySelectorAll('#split-items .split-item').forEach(function(item) {
+                const type = item.querySelector('.split-type').value;
+                const value = parseFloat(item.querySelector('.split-value').value) || 0;
+                if (type === 'fixed') {
+                    totalFixed += value;
+                } else {
+                    totalPercentage += value;
+                }
+            });
+            return { fixed: totalFixed, percentage: totalPercentage };
+        }
+
+        function getRandomAmount(type) {
+            const orderAmount = parseFloat(document.getElementById('order_amount').value) || 100;
+            const used = getUsedSplitTotals();
+
+            if (type === 'fixed') {
+                const remaining = orderAmount - used.fixed;
+                if (remaining <= 0) return 1;
+                const maxAmount = Math.min(remaining, 10); // Max RM 10 per split
+                const minAmount = Math.min(1, maxAmount);
+                return Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
+            } else {
+                const remaining = 100 - used.percentage;
+                if (remaining <= 0) return 1;
+                const maxPercent = Math.min(remaining, 10); // Max 10% per split
+                const minPercent = Math.min(1, maxPercent);
+                return Math.floor(Math.random() * (maxPercent - minPercent + 1)) + minPercent;
+            }
+        }
+
+        function addSplitItem() {
+            if (splitCount >= maxSplits) return;
+            splitCount++;
+
+            const randomEmail = getRandomEmail();
+            const randomType = getRandomType();
+            const randomAmount = getRandomAmount(randomType);
+
+            const item = document.createElement('div');
+            item.className = 'split-item';
+            item.setAttribute('data-split-id', splitCount);
+            item.innerHTML =
+                '<div class="split-item-header">' +
+                    '<span class="split-item-title">Recipient #' + splitCount + '</span>' +
+                    '<button type="button" class="split-remove-btn" onclick="removeSplitItem(this)"><i class="fas fa-times"></i></button>' +
+                '</div>' +
+                '<div class="split-row">' +
+                    '<input type="email" class="form-control split-email" value="' + randomEmail + '" onchange="updateSplitsData()">' +
+                    '<select class="form-control split-type" onchange="updateSplitsData()">' +
+                        '<option value="fixed"' + (randomType === 'fixed' ? ' selected' : '') + '>RM</option>' +
+                        '<option value="percentage"' + (randomType === 'percentage' ? ' selected' : '') + '>%</option>' +
+                    '</select>' +
+                    '<input type="number" class="form-control split-value" value="' + randomAmount + '" min="0" step="0.01" onchange="updateSplitsData()">' +
+                '</div>';
+
+            splitItems.appendChild(item);
+            updateAddButton();
+            updateSplitsData();
+        }
+
+        window.removeSplitItem = function(btn) {
+            btn.closest('.split-item').remove();
+            splitCount--;
+            updateAddButton();
+            renumberSplitItems();
+            updateSplitsData();
+        };
+
+        function renumberSplitItems() {
+            const items = splitItems.querySelectorAll('.split-item');
+            items.forEach(function(item, index) {
+                item.querySelector('.split-item-title').textContent = 'Recipient #' + (index + 1);
+            });
+        }
+
+        function updateAddButton() {
+            if (splitAddBtn) {
+                splitAddBtn.disabled = splitCount >= maxSplits;
+                splitAddBtn.innerHTML = splitCount >= maxSplits
+                    ? '<i class="fas fa-ban"></i> Maximum 6 recipients reached'
+                    : '<i class="fas fa-plus"></i> Add Recipient';
+            }
+        }
+
+        window.updateSplitsData = function() {
+            const toggle = document.getElementById('split-toggle');
+            const splitsField = document.getElementById('splits');
+            const itemsContainer = document.getElementById('split-items');
+
+            if (!toggle || !toggle.checked || !splitsField) {
+                if (splitsField) splitsField.value = '';
+                return;
+            }
+
+            const splits = [];
+            const items = itemsContainer.querySelectorAll('.split-item');
+            items.forEach(function(item) {
+                const email = item.querySelector('.split-email').value.trim();
+                const type = item.querySelector('.split-type').value;
+                const value = parseFloat(item.querySelector('.split-value').value) || 0;
+
+                if (email && value > 0) {
+                    splits.push({
+                        recipient_email: email,
+                        type: type,
+                        value: value
+                    });
+                }
+            });
+
+            splitsField.value = splits.length > 0 ? JSON.stringify(splits) : '';
+        };
 
         const emandateSubmitBtn = document.getElementById('emandate-submit-btn');
         if (emandateSubmitBtn) {

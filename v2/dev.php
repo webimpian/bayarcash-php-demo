@@ -72,20 +72,6 @@ function logRawResponse($response, $request_data = null, $endpoint = null, $stat
     file_put_contents($log_dir . '/payment_intent_raw.log', json_encode($log_entry, JSON_PRETTY_PRINT) . "\n" . str_repeat('-', 80) . "\n", FILE_APPEND);
 }
 
-function logError($message, $context = []) {
-    $log_dir = __DIR__ . '/logs';
-    if (!is_dir($log_dir)) {
-        mkdir($log_dir, 0755, true);
-    }
-
-    $log_entry = [
-        'timestamp' => date('Y-m-d H:i:s'),
-        'message' => $message,
-        'context' => $context
-    ];
-
-    file_put_contents($log_dir . '/error.log', json_encode($log_entry, JSON_PRETTY_PRINT) . "\n" . str_repeat('-', 80) . "\n", FILE_APPEND);
-}
 
 function generateRandomName(): string {
     $firstNames = ['Ahmad', 'Mohd', 'Mohammed', 'Muhammad', 'Nur', 'Nurul', 'Siti', 'Amir', 'Aina', 'Azizah', 'Fatimah', 'Ismail', 'Zulkifli', 'Noraini', 'Hashim', 'Zainab'];
@@ -138,7 +124,7 @@ function generateDefaultOrderData(): array {
 
     return [
         'order_no' => 'DEV' . str_pad(mt_rand(1, 9999), 6, '0', STR_PAD_RIGHT),
-        'order_amount' => '10.00',
+        'order_amount' => '100.00',
         'buyer_name' => $buyer_name,
         'buyer_email' => generateRandomEmail($buyer_name),
         'buyer_tel' => '0196788044',
@@ -164,8 +150,6 @@ function generateRandomProofOfPayment(): string {
     imagestring($image, 5, 50, 90, 'Proof of Payment - ' . date('Y-m-d H:i:s'), $textColor);
     imagepng($image, $filepath);
     imagedestroy($image);
-
-    logError('Generated proof of payment file', ['filename' => $filename, 'filepath' => $filepath]);
 
     return $filepath;
 }
@@ -198,9 +182,6 @@ function makeApiRequest($url, $data = null, $custom_bearer_token = null): array 
     $decoded_response = json_decode($response, true);
     logRawResponse($decoded_response, $data, $url, $http_code);
 
-    if (!empty($curl_error)) {
-        logError('CURL Error', ['url' => $url, 'error' => $curl_error, 'request_data' => $data]);
-    }
 
     return [
         'status_code' => $http_code,
@@ -228,13 +209,6 @@ function fetchMerchantInfo($custom_bearer_token = null): array {
         $error_msg .= ' (Status code: ' . $portals_result['status_code'] . ')';
     }
 
-    logError('Merchant Info Fetch Failed', [
-        'status_code' => $portals_result['status_code'],
-        'response' => $portals_result['response'],
-        'error' => $portals_result['error'],
-        'custom_bearer_token_used' => !empty($custom_bearer_token)
-    ]);
-
     return ['success' => false, 'message' => $error_msg];
 }
 
@@ -245,11 +219,6 @@ function validateAmount($amount): bool {
 function validateEmailForEMandate($email, $buyer_name, $order_no): string {
     if (strlen($email) > 27) {
         $new_email = generateRandomEmail($buyer_name, 27);
-        logError('Email too long for eMandate, generated new one', [
-            'original_email' => $email,
-            'new_email' => $new_email,
-            'order_no' => $order_no
-        ]);
         return $new_email;
     }
     return $email;
@@ -286,7 +255,7 @@ function buildPaymentIntentRequest($form_data): array {
     $defaults = generateDefaultOrderData();
     $order_data = array_merge($defaults, $form_data);
 
-    return [
+    $request = [
         'payment_channel' => (int)$form_data['payment_method'],
         'portal_key' => $current_config['bayarcash_portal_key'],
         'order_number' => $order_data['order_no'],
@@ -296,20 +265,22 @@ function buildPaymentIntentRequest($form_data): array {
         'payer_telephone_number' => $order_data['buyer_tel'],
         'return_url' => $config['return_url']
     ];
+
+    // Add splits if provided
+    if (!empty($form_data['splits'])) {
+        $splits = json_decode($form_data['splits'], true);
+        if (is_array($splits) && count($splits) > 0 && count($splits) <= 6) {
+            $request['splits'] = $splits;
+        }
+    }
+
+    return $request;
 }
 
 function processEMandateEnrollment($form_data): array {
     global $mandates_endpoint;
 
     $request_data = buildEMandateRequest($form_data);
-
-    logError('eMandate Request Initiated', [
-        'order_no' => $request_data['order_number'],
-        'amount' => $request_data['amount'],
-        'endpoint' => $mandates_endpoint,
-        'email_length' => strlen($request_data['payer_email']),
-        'request_data' => $request_data
-    ]);
 
     return makeApiRequest($mandates_endpoint, $request_data);
 }
@@ -318,14 +289,6 @@ function processPaymentIntent($form_data): array {
     global $api_endpoint;
 
     $request_data = buildPaymentIntentRequest($form_data);
-
-    logError('Payment Intent Request Initiated', [
-        'order_no' => $request_data['order_number'],
-        'payment_channel' => $request_data['payment_channel'],
-        'amount' => $request_data['amount'],
-        'endpoint' => $api_endpoint,
-        'request_data' => $request_data
-    ]);
 
     return makeApiRequest($api_endpoint, $request_data);
 }
@@ -370,15 +333,6 @@ function processManualBankTransfer($form_data): array {
         'raw_website' => json_encode($raw_website)
     ];
 
-    logError('Manual Bank Transfer Request Initiated', [
-        'order_no' => $order_data['order_no'],
-        'amount' => $order_data['order_amount'],
-        'bank' => $bank_name,
-        'endpoint' => $manual_transfer_endpoint,
-        'proof_file' => $proof_file,
-        'request_data' => $request_data
-    ]);
-
     $ch = curl_init($manual_transfer_endpoint);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -402,17 +356,12 @@ function processManualBankTransfer($form_data): array {
 
     logRawResponse($response, $request_data, $manual_transfer_endpoint, $http_code);
 
-    if (!empty($curl_error)) {
-        logError('Manual Transfer CURL Error', ['url' => $manual_transfer_endpoint, 'error' => $curl_error, 'request_data' => $request_data]);
-    }
-
     $decoded_response = strpos($response, '<form') !== false
         ? ['html_form' => $response, 'is_html' => true]
         : json_decode($response, true);
 
     if (file_exists($proof_file)) {
         unlink($proof_file);
-        logError('Cleaned up proof of payment file', ['filepath' => $proof_file]);
     }
 
     return [
@@ -517,27 +466,6 @@ function generateErrorMessage($api_result): string {
     return 'Unknown error occurred. Status code: ' . $api_result['status_code'];
 }
 
-function logPaymentResult($api_result, $form_data, $payment_method, $success = false): void {
-    $log_data = [
-        'order_no' => $form_data['order_no'] ?? 'generated',
-        'payment_method' => $payment_method,
-        'status_code' => $api_result['status_code']
-    ];
-
-    if ($success) {
-        $log_data['redirect_url'] = $api_result['response']['url'];
-        logError('Payment/Mandate Success - Redirecting', $log_data);
-    } else {
-        logError('Payment/Mandate Failed', array_merge($log_data, [
-            'expected_status' => 201,
-            'actual_status' => $api_result['status_code'],
-            'api_response' => $api_result['response'],
-            'api_error' => $api_result['error'],
-            'raw_response' => $api_result['raw_response'],
-            'parsed_errors' => parseApiErrors($api_result)
-        ]));
-    }
-}
 
 // AJAX: Fetch merchant info
 if (isset($_POST['action']) && $_POST['action'] === 'fetch_merchant_info') {
@@ -571,7 +499,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
 
     if (!validateAmount($order_amount)) {
         $error_message = 'Please enter a valid amount greater than 0';
-        logError('Invalid Amount', ['submitted_amount' => $order_amount, 'payment_method' => $payment_method]);
     } else {
         try {
             if ($payment_method === 'emandate') {
@@ -582,7 +509,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $expected_status_code = 200;
 
                 if ($api_result['status_code'] == $expected_status_code && isset($api_result['response']['is_html']) && $api_result['response']['is_html']) {
-                    logPaymentResult($api_result, $_POST, $payment_method, true);
                     echo $api_result['response']['html_form'];
                     exit();
                 }
@@ -592,26 +518,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
             }
 
             if ($api_result['status_code'] == $expected_status_code && isset($api_result['response']['url'])) {
-                logPaymentResult($api_result, $_POST, $payment_method, true);
                 header("Location: " . $api_result['response']['url']);
                 exit();
             }
 
-            logPaymentResult($api_result, $_POST, $payment_method, false);
             $error_message = generateErrorMessage($api_result);
             $errors = parseApiErrors($api_result);
         } catch (Exception $exception) {
             $error_message = 'An unexpected error occurred: ' . $exception->getMessage();
             $errors = [];
-
-            logError('Exception Occurred', [
-                'order_no' => $order_no,
-                'payment_method' => $payment_method,
-                'exception_message' => $exception->getMessage(),
-                'exception_trace' => $exception->getTraceAsString(),
-                'exception_file' => $exception->getFile(),
-                'exception_line' => $exception->getLine()
-            ]);
         }
     }
 }
