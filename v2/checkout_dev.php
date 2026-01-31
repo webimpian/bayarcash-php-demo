@@ -5,7 +5,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bayarcash Checkout Example Using v2 API Endpoint</title>
+    <title>Bayarcash API v2 - Development Sandbox</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/desktop.css">
@@ -65,6 +65,200 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
         }
         .config-default {
             color: #6c757d;
+        }
+        /* Config Panel Styles */
+        .config-panel {
+            background: #5a67d8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(90, 103, 216, 0.3);
+        }
+        .config-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .config-panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .config-panel-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .config-panel-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        .config-status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .config-status-item {
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .config-status-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+        .config-status-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .config-status-value.active {
+            color: #90EE90;
+        }
+        .config-status-value .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+        }
+        .config-status-value.active .status-dot {
+            background: #90EE90;
+            box-shadow: 0 0 8px rgba(144, 238, 144, 0.6);
+        }
+        /* Override Modal Styles */
+        .override-modal .modal-content {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .override-modal .modal-header {
+            background: #5a67d8;
+            color: white;
+            border: none;
+            padding: 20px 25px;
+        }
+        .override-modal .modal-header .close {
+            color: white;
+            opacity: 0.8;
+            text-shadow: none;
+        }
+        .override-modal .modal-header .close:hover {
+            opacity: 1;
+        }
+        .override-modal .modal-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .override-modal .modal-body {
+            padding: 25px;
+        }
+        .override-modal .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .override-modal .form-control {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .override-modal .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        .override-modal .current-config-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .override-modal .current-config-box h6 {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .override-modal .config-value-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .override-modal .config-value-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 100px;
+        }
+        .override-modal .config-value-text {
+            color: #888;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        .override-modal .modal-footer {
+            border-top: 1px solid #eee;
+            padding: 15px 25px;
+        }
+        .override-modal .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .override-modal .btn-danger {
+            background: #e53e3e;
+            border: none;
+        }
+        .override-modal .btn-primary {
+            background: #5a67d8;
+            border: none;
+        }
+        .override-info-alert {
+            background: #e6fffa;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .override-info-alert i {
+            color: #00897b;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+        .override-info-alert-text {
+            color: #00695c;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 576px) {
+            .config-status-grid {
+                grid-template-columns: 1fr;
+            }
+            .config-panel {
+                padding: 15px;
+            }
         }
         .modal {
             display: none;
@@ -178,68 +372,19 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 </div>
 <div id="container" class="container col-4 mt-3 mb-4 container-width">
 
-    <!-- Reference -->
-    <div class="mb-3">
-        <div>
-            <a target="_blank" href="https://github.com/webimpian/bayarcash-php-demo">
-                Reference from GitHub repo &#187;
-            </a>
-        </div>
-        <div class="mt-1">
-            <a target="_blank" href="https://api.webimpian.support/bayarcash">
-                Bayarcash API documentation &#187;
-            </a>
-        </div>
-        <div class="mt-1">
-            <strong>API Version:</strong> <span id="api-version-display"><?php echo htmlspecialchars($api_version); ?></span>
-        </div>
-        <?php if ($config['environment'] === 'dev'): ?>
-            <div class="mt-1">
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="config-button">
-                    <i class="fas fa-cog"></i> Override Config
-                </button>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Configuration Status (Dev Only) -->
     <?php if ($config['environment'] === 'dev'): ?>
-        <div class="card mb-3">
-            <div class="card-body py-2">
-                <div class="config-status">
-                    <div>
-                        <strong>Bearer Token:</strong>
-                        <span id="bearer-status" class="config-default">Using config default</span>
-                    </div>
-                    <div>
-                        <strong>Portal Key:</strong>
-                        <span id="portal-status" class="config-default">Using config default</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Merchant Information Card -->
-    <div class="card shadow mb-3" id="merchant-info-card" style="display: none;">
-        <div class="card-header bg-success text-white">
-            <i class="fas fa-check-circle"></i> Connected Merchant Account
-            <?php if ($config['environment'] === 'dev'): ?>
-                <button type="button" class="btn btn-sm btn-outline-light float-right" onclick="fetchMerchantInfo()" title="Refresh merchant info">
-                    <i class="fas fa-sync"></i>
-                </button>
-            <?php endif; ?>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12" id="merchant-info-content">
-                    <div class="text-center">
-                        <i class="fas fa-spinner fa-spin"></i> Loading merchant information...
-                    </div>
-                </div>
-            </div>
+    <!-- Config Panel (Dev Only) -->
+    <div class="config-panel">
+        <div class="config-panel-header">
+            <h6 class="config-panel-title">
+                <i class="fas fa-sliders-h"></i> API Configuration
+            </h6>
+            <button type="button" class="config-panel-btn" id="config-button">
+                <i class="fas fa-edit"></i> Override
+            </button>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Alert -->
     <?php if ($error_message): ?>
@@ -408,55 +553,57 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 </div>
 
 <?php if ($config['environment'] === 'dev'): ?>
-    <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configModalLabel">
+    <div class="modal fade override-modal" id="configModal" tabindex="-1" role="dialog" aria-labelledby="configModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="configModalLabel">
-                        <i class="fas fa-cog"></i> Override Configuration
+                        <i class="fas fa-sliders-h"></i> Override Configuration
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-info">
+                    <div class="override-info-alert mb-4">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Note:</strong> These overrides are stored in your browser's local storage and will only affect this browser session. Leave fields empty to use default config values.
+                        <div class="override-info-alert-text">
+                            <strong>Browser Storage:</strong> These overrides are stored in your browser's local storage and will persist across sessions. Leave fields empty to use default config values.
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="override-bearer-input"><strong>Bearer Token Override</strong></label>
-                        <textarea class="form-control" id="override-bearer-input" rows="3" placeholder="Enter custom bearer token or leave empty to use config default"></textarea>
-                        <small class="form-text text-muted">This will override the bayarcash_bearer_token from config</small>
+                    <div class="form-group mb-4">
+                        <label for="override-bearer-input">
+                            <i class="fas fa-key text-muted mr-1"></i> Bearer Token Override
+                        </label>
+                        <textarea class="form-control" id="override-bearer-input" rows="3" placeholder="Paste your bearer token here..."></textarea>
+                        <small class="form-text text-muted">Overrides bayarcash_bearer_token from config-v2.php</small>
                     </div>
 
-                    <div class="form-group">
-                        <label for="override-portal-input"><strong>Portal Key Override</strong></label>
-                        <input type="text" class="form-control" id="override-portal-input" placeholder="Enter custom portal key or leave empty to use config default">
-                        <small class="form-text text-muted">This will override the bayarcash_portal_key from config</small>
+                    <div class="form-group mb-4">
+                        <label for="override-portal-input">
+                            <i class="fas fa-door-open text-muted mr-1"></i> Portal Key Override
+                        </label>
+                        <input type="text" class="form-control" id="override-portal-input" placeholder="Enter portal key...">
+                        <small class="form-text text-muted">Overrides bayarcash_portal_key from config-v2.php</small>
                     </div>
 
-                    <div class="mt-3">
-                        <h6>Current Config Values:</h6>
-                        <div class="row">
-                            <div class="col-12">
-                                <small class="text-muted">
-                                    <strong>Bearer Token:</strong> <?php echo htmlspecialchars(substr($current_config['bayarcash_bearer_token'], 0, 50) . '...'); ?><br>
-                                    <strong>Portal Key:</strong> <?php echo htmlspecialchars($current_config['bayarcash_portal_key']); ?><br>
-                                    <em class="text-info">* Merchant info will refresh automatically when overrides are saved</em>
-                                </small>
-                            </div>
+                    <div class="current-config-box">
+                        <h6><i class="fas fa-plug"></i> Current Connection (Default)</h6>
+                        <div id="modal-merchant-info">
+                            <span class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</span>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="clear-overrides">
-                        <i class="fas fa-trash"></i> Clear All Overrides
+                        <i class="fas fa-trash-alt"></i> Clear All
                     </button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
                     <button type="button" class="btn btn-primary" id="save-overrides">
-                        <i class="fas fa-save"></i> Save Overrides
+                        <i class="fas fa-check"></i> Save Overrides
                     </button>
                 </div>
             </div>
@@ -478,19 +625,19 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
         const portalOverride = localStorage.getItem('bayarcash_portal_key_override');
 
         if (bearerOverride && bearerOverride.trim() !== '') {
-            bearerStatus.className = 'override-active';
-            bearerStatus.textContent = 'Using browser override';
+            bearerStatus.classList.add('active');
+            bearerStatus.querySelector('.status-text').textContent = 'Browser Override';
         } else {
-            bearerStatus.className = 'config-default';
-            bearerStatus.textContent = 'Using config default';
+            bearerStatus.classList.remove('active');
+            bearerStatus.querySelector('.status-text').textContent = 'Config Default';
         }
 
         if (portalOverride && portalOverride.trim() !== '') {
-            portalStatus.className = 'override-active';
-            portalStatus.textContent = 'Using browser override';
+            portalStatus.classList.add('active');
+            portalStatus.querySelector('.status-text').textContent = 'Browser Override';
         } else {
-            portalStatus.className = 'config-default';
-            portalStatus.textContent = 'Using config default';
+            portalStatus.classList.remove('active');
+            portalStatus.querySelector('.status-text').textContent = 'Config Default';
         }
     }
 
@@ -565,21 +712,23 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
         return year + month + day + placeCode + sequential + gender;
     }
 
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
     function fetchMerchantInfo() {
+        const merchantInfo = document.getElementById('modal-merchant-info');
+        if (!merchantInfo) return;
+
         const bearerOverride = localStorage.getItem('bayarcash_bearer_token_override');
-        const merchantCard = document.getElementById('merchant-info-card');
-        const merchantContent = document.getElementById('merchant-info-content');
-        const merchantHeader = merchantCard.querySelector('.card-header');
-
-        merchantHeader.className = 'card-header bg-success text-white';
-        merchantHeader.innerHTML = '<i class="fas fa-check-circle"></i> Connected Merchant Account' +
-            (document.getElementById('config-button') ?
-                '<button type="button" class="btn btn-sm btn-outline-light float-right" onclick="fetchMerchantInfo()" title="Refresh merchant info">' +
-                '<i class="fas fa-sync"></i>' +
-                '</button>' : '');
-
-        merchantCard.style.display = 'block';
-        merchantContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading merchant information...</div>';
+        merchantInfo.innerHTML = '<span class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading...</span>';
 
         const requestData = new FormData();
         requestData.append('action', 'fetch_merchant_info');
@@ -591,51 +740,28 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
             method: 'POST',
             body: requestData
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.merchant) {
-                    var merchant = data.merchant;
-                    merchantContent.innerHTML =
-                        '<p class="mb-2"><strong>Merchant Name:</strong> ' + escapeHtml(merchant.name) + '</p>' +
-                        '<p class="mb-2"><strong>Email:</strong> ' + escapeHtml(merchant.email) + '</p>' +
-                        (bearerOverride ? '<small class="text-info"><i class="fas fa-info-circle"></i> Using browser override bearer token</small>' :
-                            '<small class="text-muted"><i class="fas fa-info-circle"></i> Using config default bearer token</small>');
-                } else {
-                    merchantHeader.className = 'card-header bg-warning text-dark';
-                    merchantHeader.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Merchant Connection Issue' +
-                        (document.getElementById('config-button') ?
-                            '<button type="button" class="btn btn-sm btn-outline-dark float-right" onclick="fetchMerchantInfo()" title="Refresh merchant info">' +
-                            '<i class="fas fa-sync"></i>' +
-                            '</button>' : '');
-                    merchantContent.innerHTML =
-                        '<div class="text-warning">' +
-                        '<strong>Error:</strong> ' + escapeHtml(data.message || 'Unable to fetch merchant information') + '</div>' +
-                        (bearerOverride ? '<small class="text-info mt-2 d-block"><i class="fas fa-info-circle"></i> Using browser override bearer token</small>' :
-                            '<small class="text-muted mt-2 d-block"><i class="fas fa-info-circle"></i> Using config default bearer token</small>');
-                }
-            })
-            .catch(error => {
-                merchantHeader.className = 'card-header bg-danger text-white';
-                merchantHeader.innerHTML = '<i class="fas fa-times-circle"></i> Connection Error' +
-                    (document.getElementById('config-button') ?
-                        '<button type="button" class="btn btn-sm btn-outline-light float-right" onclick="fetchMerchantInfo()" title="Refresh merchant info">' +
-                        '<i class="fas fa-sync"></i>' +
-                        '</button>' : '');
-                merchantContent.innerHTML =
-                    '<div class="text-danger"><strong>Connection Error:</strong> Unable to reach API</div>';
-                console.error('Merchant info fetch error:', error);
-            });
-    }
+        .then(response => response.json())
+        .then(data => {
+            const portalOverride = localStorage.getItem('bayarcash_portal_key_override');
+            const portalKey = portalOverride && portalOverride.trim() !== '' ? portalOverride.trim() : '<?php echo htmlspecialchars($current_config['bayarcash_portal_key']); ?>';
 
-    function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            if (data.success && data.merchant) {
+                merchantInfo.innerHTML =
+                    '<div style="margin-bottom:8px;">' +
+                        '<i class="fas fa-store text-muted" style="margin-right:8px;"></i>' +
+                        '<strong>' + escapeHtml(data.merchant.name) + '</strong> <span class="text-muted">(' + escapeHtml(data.merchant.email) + ')</span>' +
+                    '</div>' +
+                    '<div>' +
+                        '<i class="fas fa-key text-muted" style="margin-right:8px;"></i>' +
+                        '<code style="font-size:0.8rem;">' + escapeHtml(portalKey) + '</code>' +
+                    '</div>';
+            } else {
+                merchantInfo.innerHTML = '<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(data.message || 'Unable to fetch') + '</span>';
+            }
+        })
+        .catch(error => {
+            merchantInfo.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Connection error</span>';
+        });
     }
 
     function showAlert(type, message) {
@@ -668,6 +794,7 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
         if (!modal) return;
 
         loadOverrideValues();
+        fetchMerchantInfo();
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop';
         backdrop.id = 'modal-backdrop';
@@ -694,7 +821,6 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
 
     document.addEventListener('DOMContentLoaded', function() {
         setHiddenFormFields();
-        fetchMerchantInfo();
 
         const paymentTypeToggle = document.getElementById('payment-type-toggle');
         if (paymentTypeToggle) {
