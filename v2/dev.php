@@ -256,7 +256,6 @@ function buildPaymentIntentRequest($form_data): array {
     $order_data = array_merge($defaults, $form_data);
 
     $request = [
-        'payment_channel' => (int)$form_data['payment_method'],
         'portal_key' => $current_config['bayarcash_portal_key'],
         'order_number' => $order_data['order_no'],
         'amount' => (float)$order_data['order_amount'],
@@ -265,6 +264,26 @@ function buildPaymentIntentRequest($form_data): array {
         'payer_telephone_number' => $order_data['buyer_tel'],
         'return_url' => $config['return_url']
     ];
+
+    // Handle payment_channel modes:
+    // - 'all' or empty: omit payment_channel (let API show all available)
+    // - comma-separated: send as array (multi-channel selection)
+    // - single number: send as integer (direct to specific channel)
+    $payment_method = $form_data['payment_method'] ?? '';
+
+    if ($payment_method !== '' && $payment_method !== 'all') {
+        if (strpos($payment_method, ',') !== false) {
+            // Multi-channel: convert "1,5,6" to [1, 5, 6]
+            $channels = array_map('intval', array_filter(explode(',', $payment_method)));
+            if (!empty($channels)) {
+                $request['payment_channel'] = $channels;
+            }
+        } else {
+            // Single channel
+            $request['payment_channel'] = (int)$payment_method;
+        }
+    }
+    // If 'all' or empty, payment_channel is omitted entirely
 
     // Add splits if provided
     if (!empty($form_data['splits'])) {

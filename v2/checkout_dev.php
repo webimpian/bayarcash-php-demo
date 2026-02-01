@@ -586,6 +586,128 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                 grid-template-columns: 1fr;
             }
         }
+        /* Channel Mode Selector */
+        .channel-mode-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .channel-mode-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .channel-mode-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .channel-mode-tab:hover {
+            border-color: #5a67d8;
+            background: #f8f9ff;
+        }
+        .channel-mode-tab.active {
+            border-color: #5a67d8;
+            background: #5a67d8;
+            color: white;
+        }
+        /* Multi-Channel Panel */
+        .multi-channel-panel {
+            background: #e8f4f8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #17a2b8;
+        }
+        .multi-channel-panel.hidden {
+            display: none;
+        }
+        .multi-channel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .selected-count {
+            background: #17a2b8;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .multi-channel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .multi-channel-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin: 0;
+            transition: all 0.2s;
+        }
+        .multi-channel-item:hover {
+            background: #d1ecf1;
+        }
+        .multi-channel-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #17a2b8;
+        }
+        /* All Channel Panel */
+        .all-channel-panel {
+            background: #d4edda;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+        }
+        .all-channel-panel.hidden {
+            display: none;
+        }
+        .all-channel-info {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .all-channel-info i {
+            font-size: 1.5rem;
+            color: #28a745;
+            margin-top: 2px;
+        }
+        .all-channel-info p {
+            font-size: 0.9rem;
+            color: #155724;
+        }
+        @media (max-width: 576px) {
+            .channel-mode-tabs {
+                flex-direction: column;
+            }
+            .channel-mode-tab {
+                min-width: auto;
+            }
+            .multi-channel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -760,6 +882,70 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                 </div>
 
                 <hr>
+
+                <!-- Payment Channel Mode Selector -->
+                <div class="channel-mode-section mb-3">
+                    <label class="mb-2"><b><i class="fas fa-layer-group"></i> Channel Selection Mode</b></label>
+                    <div class="channel-mode-tabs">
+                        <button type="button" class="channel-mode-tab active" data-mode="single">
+                            <i class="fas fa-hand-pointer"></i> Single Channel
+                        </button>
+                        <button type="button" class="channel-mode-tab" data-mode="multi">
+                            <i class="fas fa-check-double"></i> Multi-Channel
+                        </button>
+                        <button type="button" class="channel-mode-tab" data-mode="all">
+                            <i class="fas fa-globe"></i> All Channels
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1" id="channel-mode-desc">Click a payment method to proceed directly</small>
+                </div>
+
+                <!-- Multi-Channel Selection Panel -->
+                <div class="multi-channel-panel hidden" id="multi-channel-panel">
+                    <div class="multi-channel-header">
+                        <span><i class="fas fa-check-square"></i> Select Payment Channels</span>
+                        <span class="selected-count" id="selected-count">0 selected</span>
+                    </div>
+                    <div class="multi-channel-grid" id="multi-channel-grid">
+                        <label class="multi-channel-item"><input type="checkbox" value="1"> FPX Online Banking</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="4"> FPX Line of Credit</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="5"> DuitNow</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="6"> DuitNow QR</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="12"> Credit Card</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="22"> JCB</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="16"> Touch n Go</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="17"> Boost Wallet</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="18"> GrabPay</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="21"> Shopee Pay</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="7"> SPayLater</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="8"> Boost PayFlex</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="19"> GrabPay Later</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="20"> ShopBack</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="9"> QRIS Banking</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="10"> QRIS eWallet</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="11"> NETS</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="13"> Alipay</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="14"> WeChat Pay</label>
+                        <label class="multi-channel-item"><input type="checkbox" value="15"> PromptPay</label>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block mt-3" id="multi-channel-submit">
+                        <i class="fas fa-arrow-right"></i> Proceed with Selected Channels
+                    </button>
+                </div>
+
+                <!-- All Channels Panel -->
+                <div class="all-channel-panel hidden" id="all-channel-panel">
+                    <div class="all-channel-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>All Available Channels</strong>
+                            <p class="mb-0">Payment page will display all payment channels available for your portal.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-block mt-3" id="all-channel-submit">
+                        <i class="fas fa-arrow-right"></i> Proceed (Show All Channels)
+                    </button>
+                </div>
 
                 <!-- Payment Gateway Buttons -->
                 <div class="payment-buttons" id="payment-buttons">
@@ -1344,6 +1530,79 @@ global $error_message, $order_no, $order_amount, $order_description, $buyer_name
                 submitForm(gateway);
             });
         });
+
+        // Channel Mode Selector
+        const channelModeTabs = document.querySelectorAll('.channel-mode-tab');
+        const paymentButtonsSection = document.getElementById('payment-buttons');
+        const multiChannelPanel = document.getElementById('multi-channel-panel');
+        const allChannelPanel = document.getElementById('all-channel-panel');
+        const channelModeDesc = document.getElementById('channel-mode-desc');
+
+        const modeDescriptions = {
+            'single': 'Click a payment method to proceed directly',
+            'multi': 'Select multiple channels, then click proceed',
+            'all': 'Payment page will show all available channels'
+        };
+
+        channelModeTabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                const mode = this.getAttribute('data-mode');
+
+                // Update active tab
+                channelModeTabs.forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+
+                // Update description
+                channelModeDesc.textContent = modeDescriptions[mode];
+
+                // Show/hide panels
+                paymentButtonsSection.classList.remove('hidden');
+                multiChannelPanel.classList.add('hidden');
+                allChannelPanel.classList.add('hidden');
+
+                if (mode === 'single') {
+                    paymentButtonsSection.classList.remove('hidden');
+                } else if (mode === 'multi') {
+                    paymentButtonsSection.classList.add('hidden');
+                    multiChannelPanel.classList.remove('hidden');
+                } else if (mode === 'all') {
+                    paymentButtonsSection.classList.add('hidden');
+                    allChannelPanel.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Multi-channel checkboxes
+        const multiChannelGrid = document.getElementById('multi-channel-grid');
+        const selectedCountEl = document.getElementById('selected-count');
+        if (multiChannelGrid) {
+            multiChannelGrid.addEventListener('change', function() {
+                const checked = multiChannelGrid.querySelectorAll('input[type="checkbox"]:checked');
+                selectedCountEl.textContent = checked.length + ' selected';
+            });
+        }
+
+        // Multi-channel submit
+        const multiChannelSubmit = document.getElementById('multi-channel-submit');
+        if (multiChannelSubmit) {
+            multiChannelSubmit.addEventListener('click', function() {
+                const checked = multiChannelGrid.querySelectorAll('input[type="checkbox"]:checked');
+                if (checked.length === 0) {
+                    alert('Please select at least one payment channel.');
+                    return;
+                }
+                const values = Array.from(checked).map(function(cb) { return cb.value; });
+                submitForm(values.join(','));
+            });
+        }
+
+        // All channels submit
+        const allChannelSubmit = document.getElementById('all-channel-submit');
+        if (allChannelSubmit) {
+            allChannelSubmit.addEventListener('click', function() {
+                submitForm('all');
+            });
+        }
 
         // Channel tabs
         const channelTabs = document.querySelectorAll('.channel-tab');
