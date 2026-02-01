@@ -1,4 +1,31 @@
+/* Mobile-first responsive styles */
+
+/* Tablet and below */
+@media only screen and (max-width: 991px) {
+    .container-width {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .col-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* Mobile devices */
 @media only screen and (max-width: 767px) {
+    body {
+        background: #f5f5f5;
+    }
+
+    .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        margin-top: 10px !important;
+        margin-bottom: 20px !important;
+    }
 
     .container-width {
         width: 100% !important;
@@ -6,12 +33,432 @@
     }
 
     .col-4 {
-        max-width: 100%!important;
+        max-width: 100% !important;
+        padding-left: 5px;
+        padding-right: 5px;
     }
 
+    /* Card styles */
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        font-size: 1rem;
+        padding: 12px 15px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    /* Form elements */
+    .form-group {
+        margin-bottom: 12px !important;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 5px !important;
+    }
+
+    .form-control {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+
+    .input-group-text {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+
+    /* Buttons */
     .col-6.button {
         flex: 0 0 100%;
         max-width: 100%;
         margin-bottom: 10px;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
+
+    .btn-block {
+        padding: 14px 16px;
+    }
+
+    /* Config Panel */
+    .config-panel {
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .config-panel-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .config-panel-title {
+        font-size: 0.95rem;
+    }
+
+    .config-panel-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Payment Type Switcher */
+    .payment-type-switcher {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .payment-type-switcher h6 {
+        font-size: 0.9rem;
+    }
+
+    .switch-container {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .switch-label {
+        font-size: 0.8rem;
+        text-align: center;
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .switch {
+        margin: 0 8px;
+    }
+
+    /* Channel Mode Section */
+    .channel-mode-section {
+        padding: 12px;
+    }
+
+    .channel-mode-section > label {
+        font-size: 0.9rem;
+    }
+
+    .channel-mode-tabs {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .channel-mode-tab {
+        min-width: auto;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Channel Tabs */
+    .channel-tabs {
+        gap: 4px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .channel-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .channel-tab {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Channel Grid */
+    .channel-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .channel-btn {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .channel-btn .channel-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .channel-btn .channel-name {
+        font-size: 0.9rem;
+    }
+
+    .channel-btn .channel-desc {
+        font-size: 0.75rem;
+    }
+
+    /* Multi-Channel Panel */
+    .multi-channel-panel {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .multi-channel-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .multi-channel-grid {
+        grid-template-columns: 1fr !important;
+        gap: 6px;
+    }
+
+    .multi-channel-item {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    /* All Channel Panel */
+    .all-channel-panel {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .all-channel-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .all-channel-info i {
+        font-size: 2rem;
+    }
+
+    /* Split Payment Section */
+    .split-section {
+        padding: 12px;
+    }
+
+    .split-header label {
+        font-size: 0.9rem;
+    }
+
+    .split-row {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .split-item {
+        padding: 10px;
+    }
+
+    .split-item-title {
+        font-size: 0.8rem;
+    }
+
+    .split-add-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    /* eMandate Fields */
+    .emandate-fields {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .emandate-info {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+
+    .emandate-fields .col-md-6 {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 12px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+    }
+
+    /* Modal */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .modal-content {
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .override-modal .form-control {
+        font-size: 14px;
+    }
+
+    .override-modal textarea.form-control {
+        font-size: 12px;
+    }
+
+    .current-config-box {
+        padding: 12px;
+    }
+
+    .current-config-box h6 {
+        font-size: 0.9rem;
+    }
+
+    /* Loading overlay */
+    .loader-container {
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    /* Horizontal rule */
+    hr {
+        margin: 15px 0;
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media only screen and (max-width: 375px) {
+    .container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .card-body {
+        padding: 12px;
+    }
+
+    .form-control {
+        padding: 8px 10px;
+    }
+
+    .channel-btn {
+        padding: 10px;
+    }
+
+    .channel-btn .channel-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .channel-btn .channel-name {
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+
+    .switch-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .switch-label {
+        order: 1;
+    }
+
+    .switch {
+        order: 0;
+        margin-bottom: 8px;
+    }
+
+    #payment-label {
+        order: 2;
+    }
+
+    #emandate-label {
+        order: 3;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media only screen and (max-width: 767px) and (orientation: landscape) {
+    .channel-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .multi-channel-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .channel-mode-tabs {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .channel-mode-tab {
+        flex: 1;
+        min-width: calc(33.33% - 6px);
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .channel-btn:active {
+        transform: scale(0.98);
+        background: #f0f9ff;
+    }
+
+    .channel-mode-tab:active {
+        transform: scale(0.98);
+    }
+
+    .multi-channel-item:active {
+        background: #bee3f8;
+    }
+
+    /* Larger touch targets */
+    .channel-tab {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .split-remove-btn {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
